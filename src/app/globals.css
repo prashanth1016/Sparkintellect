@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --background-subtle: #f2f9ff;
+    --accent-light: #d6ebff;
+    --accent-medium: #bee0ff;
+    --accent-primary: #9fcffb;
+    --text-primary: #0b1220;
+    --text-secondary: #334155;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif), Georgia, serif;
+    color: var(--text-primary);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom Scrollbar for Light Luxury Theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f2f9ff;
+}
+::-webkit-scrollbar-thumb {
+  background: #bee0ff;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9fcffb;
+}
+
+/* Premium Light Card Styling */
+.luxury-card {
+  background: #ffffff;
+  border: 1px solid #bee0ff;
+  box-shadow: 0 4px 24px rgba(11, 18, 32, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxury-card-hover:hover {
+  border-color: #9fcffb;
+  box-shadow: 0 12px 32px rgba(11, 18, 32, 0.09);
+  transform: translateY(-6px);
+}
+
+/* Luxury Glass Nav Bar */
+.luxury-nav {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #bee0ff;
+}
+
+/* Accent Pointers & Text Gradients */
+.text-serif-heading {
+  font-family: var(--font-serif), Georgia, serif;
+}
+
+.text-gradient-navy {
+  background: linear-gradient(135deg, #0b1220 0%, #1e293b 60%, #0369a1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-accent {
+  background: linear-gradient(135deg, #0284c7 0%, #0b1220 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Subtle Light Glow Orbs */
+.light-glow-1 {
+  position: absolute;
+  top: -5%;
+  left: 15%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(214, 235, 255, 0.7) 0%, rgba(255, 255, 255, 0) 70%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.light-glow-2 {
+  position: absolute;
+  top: 20%;
+  right: 10%;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(190, 224, 255, 0.5) 0%, rgba(255, 255, 255, 0) 70%);
+  filter: blur(70px);
+  pointer-events: none;
+}
+
+@keyframes softFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-soft-float {
+  animation: softFloat 7s ease-in-out infinite;
 }
