@@ -37,83 +37,64 @@ export const FounderSection: React.FC = () => {
           subtitle="Driven by engineering passion, transparency, and AI excellence, we help organizations transform complex technology into tangible business growth."
         />
 
-        {/* Leadership Grid: Founder & Co-Founder */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          
-          {/* Founder Spotlight Card: Prashanth S */}
-          <div className="luxury-card p-8 sm:p-10 rounded-3xl border border-[#BEE0FF] bg-white shadow-xl flex flex-col justify-between">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-6">
-              <div className="relative w-44 h-56 shrink-0 rounded-3xl p-1 bg-gradient-to-br from-[#9FCFFB] via-[#0284c7] to-[#0B1220] shadow-xl group overflow-hidden">
-                <div className="relative w-full h-full rounded-[22px] overflow-hidden bg-[#0B1220]">
-                  <Image
-                    src="/founder.jpg"
-                    alt={`${COMPANY_INFO.founder} - ${COMPANY_INFO.founderRole}`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 200px"
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                    priority
-                  />
+        {/* Founder Spotlight Card */}
+        <div className="max-w-4xl mx-auto mb-16">
+          <div className="luxury-card p-8 sm:p-12 rounded-3xl border border-[#BEE0FF] bg-white shadow-xl relative overflow-hidden">
+            {/* Subtle corner decorative accent */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-[#D6EBFF]/60 via-transparent to-transparent pointer-events-none rounded-bl-full" />
+
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 lg:gap-10">
+              {/* Founder Portrait */}
+              <div className="flex flex-col items-center shrink-0">
+                <div className="relative w-48 sm:w-56 h-64 sm:h-72 rounded-3xl p-1 bg-gradient-to-br from-[#9FCFFB] via-[#0284c7] to-[#0B1220] shadow-2xl group overflow-hidden">
+                  <div className="relative w-full h-full rounded-[22px] overflow-hidden bg-[#0B1220]">
+                    <Image
+                      src="/founder.jpg"
+                      alt={`${COMPANY_INFO.founder} - ${COMPANY_INFO.founderRole}`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 240px"
+                      className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                      priority
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4 inline-flex items-center gap-1.5 text-xs text-[#334155] font-medium">
+                  <MapPin className="w-3.5 h-3.5 text-[#0284c7]" />
+                  <span>{COMPANY_INFO.headquarters}</span>
                 </div>
               </div>
 
-              <div className="space-y-3 text-center sm:text-left">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D6EBFF] border border-[#BEE0FF] text-[11px] font-mono font-bold text-[#0B1220]">
+              {/* Founder Details */}
+              <div className="space-y-4 text-center md:text-left flex-1">
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#D6EBFF] border border-[#BEE0FF] text-[11px] font-mono font-bold text-[#0B1220]">
+                  <Sparkles className="w-3 h-3 text-[#0284c7]" />
                   <span>SparkIntellect Founder</span>
                 </div>
-                <h3 className="text-2xl font-serif font-bold text-[#0B1220]">{COMPANY_INFO.founder}</h3>
-                <p className="text-sm font-semibold text-[#0284c7]">{COMPANY_INFO.founderRole}</p>
-                <div className="inline-flex items-center gap-1.5 text-xs text-[#334155]">
-                  <MapPin className="w-3.5 h-3.5 text-[#0284c7]" />
-                  <span>{COMPANY_INFO.headquarters}</span>
+
+                <div>
+                  <h3 className="text-3xl sm:text-4xl font-serif font-bold text-[#0B1220] tracking-tight">
+                    {COMPANY_INFO.founder}
+                  </h3>
+                  <p className="text-base font-semibold text-[#0284c7] mt-1">
+                    {COMPANY_INFO.founderRole}
+                  </p>
                 </div>
-                <p className="text-[#334155] text-xs leading-relaxed pt-2">
+
+                <p className="text-[#334155] text-sm sm:text-base leading-relaxed">
                   {COMPANY_INFO.founderBio}
                 </p>
-              </div>
-            </div>
 
-            <div className="p-4 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF] text-[#0B1220] italic text-xs leading-relaxed">
-              &quot;Our mission is not merely to build software; it is to engineer intelligent digital infrastructure that simplifies operations and positions our clients at the forefront of their industries.&quot;
+                {/* Founder Quote */}
+                <div className="mt-4 p-5 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF] text-[#0B1220] text-xs sm:text-sm leading-relaxed italic relative">
+                  &quot;Our mission is not merely to build software; it is to engineer intelligent digital infrastructure that simplifies operations and positions our clients at the forefront of their industries.&quot;
+                  <span className="block mt-2 not-italic text-[11px] font-mono font-bold text-[#0284c7] uppercase">
+                    — {COMPANY_INFO.founder}, {COMPANY_INFO.founderRole}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-
-          {/* Co-Founder Spotlight Card: Sakthi Pradeep T */}
-          <div className="luxury-card p-8 sm:p-10 rounded-3xl border border-[#BEE0FF] bg-white shadow-xl flex flex-col justify-between">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-6">
-              <div className="relative w-44 h-56 shrink-0 rounded-3xl p-1 bg-gradient-to-br from-[#9FCFFB] via-[#0284c7] to-[#0B1220] shadow-xl group overflow-hidden">
-                <div className="relative w-full h-full rounded-[22px] overflow-hidden bg-[#0B1220]">
-                  <Image
-                    src="/cofounder.jpg"
-                    alt={`${COMPANY_INFO.coFounder} - ${COMPANY_INFO.coFounderRole}`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 200px"
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                    priority
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3 text-center sm:text-left">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D6EBFF] border border-[#BEE0FF] text-[11px] font-mono font-bold text-[#0B1220]">
-                  <span>SparkIntellect Co-Founder</span>
-                </div>
-                <h3 className="text-2xl font-serif font-bold text-[#0B1220]">{COMPANY_INFO.coFounder}</h3>
-                <p className="text-sm font-semibold text-[#0284c7]">{COMPANY_INFO.coFounderRole}</p>
-                <div className="inline-flex items-center gap-1.5 text-xs text-[#334155]">
-                  <MapPin className="w-3.5 h-3.5 text-[#0284c7]" />
-                  <span>{COMPANY_INFO.headquarters}</span>
-                </div>
-                <p className="text-[#334155] text-xs leading-relaxed pt-2">
-                  {COMPANY_INFO.coFounderBio}
-                </p>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF] text-[#0B1220] italic text-xs leading-relaxed">
-              &quot;Operational excellence and client trust are our highest priorities. We ensure every deliverable exceeds performance expectations and drives real business ROI.&quot;
-            </div>
-          </div>
-
         </div>
 
         {/* Vision & Mission Banner */}
