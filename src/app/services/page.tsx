@@ -12,28 +12,27 @@ import {
   Bot, 
   Globe, 
   Smartphone, 
-  ShoppingBag, 
   Cpu, 
-  Cloud, 
   Zap, 
-  CheckCircle, 
+  Cloud, 
+  CheckCircle2, 
   ArrowRight,
   Sparkles
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Services & Capabilities | SparkIntellect AI & Software",
-  description: "Explore SparkIntellect's 7 core technology capabilities: AI & ML, Web Engineering, Mobile Development, E-Commerce, Custom Software ERP/CRM, Cloud DevOps, and Workflow Automation.",
+  title: "Engineering Services & Capabilities | SparkIntellect",
+  description:
+    "Explore SparkIntellect's 6 core engineering capabilities: AI & Machine Learning, Web Engineering, Mobile Development, Enterprise Software ERP/CRM, Workflow Automation, and Cloud DevOps.",
 };
 
 const ICON_MAP: Record<string, React.ElementType> = {
-  Bot,
-  Globe,
-  Smartphone,
-  ShoppingBag,
-  Cpu,
-  Cloud,
-  Zap,
+  "ai-development": Bot,
+  "web-development": Globe,
+  "mobile-development": Smartphone,
+  "enterprise-software": Cpu,
+  "automation": Zap,
+  "cloud-devops": Cloud,
 };
 
 export default function ServicesPage() {
@@ -45,39 +44,36 @@ export default function ServicesPage() {
       <main className="relative z-10 pt-32 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          {/* Header */}
           <SectionHeading
-            badge="Technical Specifications"
-            title="Our Full-Spectrum Software &"
-            highlightTitle="AI Capabilities"
-            subtitle="Explore how our engineering teams design, build, and maintain production-ready AI models, robust web apps, native mobile platforms, and enterprise cloud systems."
+            badge="Capabilities & Architecture"
+            title="Technology Built Around Your"
+            highlightTitle="Business Architecture"
+            subtitle="Explore our specialized engineering disciplines designed to turn operational friction into scalable software platforms."
           />
 
-          {/* Service Cards Stack */}
-          <div className="space-y-12">
+          <div className="space-y-12 mb-16">
             {SERVICES.map((service, index) => {
-              const Icon = ICON_MAP[service.iconName] || Cpu;
+              const Icon = ICON_MAP[service.slug] || Sparkles;
 
               return (
                 <SectionWrapper
                   key={service.id}
-                  id={service.id}
+                  id={service.slug}
                   className="luxury-card p-8 sm:p-12 rounded-3xl border border-[#BEE0FF] bg-white scroll-mt-32 shadow-xl"
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     
-                    {/* Main Description */}
                     <div className="lg:col-span-7 space-y-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center shrink-0">
-                          <Icon className="w-7 h-7 text-[#0284c7]" />
+                        <div className="w-14 h-14 rounded-2xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center shrink-0 text-[#0284c7]">
+                          <Icon className="w-7 h-7" />
                         </div>
                         <div>
                           <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#0B1220]">
                             {service.title}
                           </h2>
                           <span className="text-xs font-mono text-[#0284c7]">
-                            Capability ID: {service.id}
+                            Service Domain: {service.slug}
                           </span>
                         </div>
                       </div>
@@ -86,44 +82,41 @@ export default function ServicesPage() {
                         {service.fullDesc}
                       </p>
 
-                      {/* Sub-Categories */}
                       <div className="space-y-3 pt-2">
                         <h3 className="text-xs font-mono text-[#0284c7] uppercase font-bold tracking-wider">
-                          Key Solutions Included:
+                          Key Capabilities Included:
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          {service.subCategories.map((sub, i) => (
+                          {service.capabilities.map((cap, i) => (
                             <div key={i} className="p-3 rounded-xl bg-[#F2F9FF] border border-[#BEE0FF] text-xs text-[#0B1220] flex items-center gap-2">
-                              <CheckCircle className="w-4 h-4 text-[#0284c7] shrink-0" />
-                              <span>{sub}</span>
+                              <CheckCircle2 className="w-4 h-4 text-[#0284c7] shrink-0" />
+                              <span>{cap}</span>
                             </div>
                           ))}
                         </div>
                       </div>
 
-                      {/* Key Features & Stack */}
                       <div className="pt-4 border-t border-[#BEE0FF] flex flex-wrap items-center justify-between gap-4">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-xs text-[#334155] font-mono">Tech Stack:</span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="text-xs text-[#334155] font-mono mr-1">Stack:</span>
                           {service.techStack.map((tech) => (
-                            <span key={tech} className="px-3 py-1 rounded-full bg-[#D6EBFF] border border-[#BEE0FF] text-xs text-[#0B1220] font-mono font-semibold">
+                            <span key={tech} className="px-2.5 py-0.5 rounded-full bg-[#D6EBFF] border border-[#BEE0FF] text-xs text-[#0B1220] font-mono font-semibold">
                               {tech}
                             </span>
                           ))}
                         </div>
 
                         <Link
-                          href="/contact"
-                          className="px-5 py-2.5 rounded-full font-bold text-xs bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-md flex items-center gap-2"
+                          href={`/services/${service.slug}`}
+                          className="px-6 py-2.5 rounded-full font-bold text-xs bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-md flex items-center gap-1.5 transition-all"
                         >
-                          <span>Consult on {service.title}</span>
-                          <ArrowRight className="w-4 h-4" />
+                          <span>Explore {service.title}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>
 
                     </div>
 
-                    {/* Features Showcase Box */}
                     <div className="lg:col-span-5 p-6 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF] space-y-4">
                       <h4 className="text-sm font-bold text-[#0B1220] flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-[#0284c7]" />
@@ -133,7 +126,7 @@ export default function ServicesPage() {
                       <div className="space-y-3">
                         {service.keyFeatures.map((feat, i) => (
                           <div key={i} className="p-3.5 rounded-xl bg-white border border-[#BEE0FF] text-xs text-[#334155]">
-                            <span className="font-semibold text-[#0B1220] block mb-1">Feature 0{i + 1}</span>
+                            <span className="font-bold text-[#0B1220] block mb-1">Architecture 0{i + 1}</span>
                             {feat}
                           </div>
                         ))}

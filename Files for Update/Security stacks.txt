@@ -1,0 +1,2133 @@
+For your SparkIntellect setup, I would treat security as a production architecture, not as a few .env variables or a .gitignore file.
+
+Your stack is:
+
+Next.js → Netlify → Node.js backend → Render → MongoDB Atlas → Google Sheets/Drive → email provider
+
+For this architecture, the goal should be:
+
+Assume the frontend is public and potentially compromised. Keep every secret and every privileged operation behind the backend, enforce authorization server-side, minimize attack surface, and make a compromised component unable to compromise the rest of the system.
+
+Below is the security architecture I would use.
+
+1. First: what should NOT be in production?
+
+There are several things I would deliberately avoid.
+
+❌ Don't expose MongoDB to the frontend
+
+Never:
+
+Next.js → MongoDB
+
+Always:
+
+Next.js → Backend → MongoDB
+
+The MongoDB connection string must never be sent to the browser.
+
+❌ Don't put secrets in Next.js NEXT_PUBLIC_*
+
+Anything beginning with:
+
+NEXT_PUBLIC_
+
+is potentially exposed to the browser.
+
+So never do:
+
+NEXT_PUBLIC_MONGODB_URI=
+NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=
+NEXT_PUBLIC_RESEND_API_KEY=
+NEXT_PUBLIC_JWT_SECRET=
+NEXT_PUBLIC_DATABASE_PASSWORD=
+
+These are serious mistakes.
+
+Only genuinely public configuration belongs in NEXT_PUBLIC_*.
+
+❌ Don't store authentication tokens in localStorage
+
+Avoid:
+
+localStorage.setItem("token", token)
+
+for your admin authentication.
+
+Prefer:
+
+HttpOnly
+Secure
+SameSite
+
+cookies/session mechanisms.
+
+This significantly reduces the impact of many XSS scenarios.
+
+❌ Don't use one shared admin account
+
+Never:
+
+admin@sparkintellect.in
+password123
+
+used by everyone.
+
+Each employee gets their own account.
+
+The CEO has a separate account.
+
+❌ Don't give employees database access
+
+Employees should never receive:
+
+MongoDB username
+MongoDB password
+MongoDB URI
+
+Their access goes through the Admin Panel → Backend.
+
+❌ Don't give employees Render access unless absolutely necessary
+
+Render access should be restricted to the technical owners.
+
+An employee who only manages internships shouldn't have infrastructure access.
+
+❌ Don't give employees GitHub repository write access unnecessarily
+
+A recruitment employee doesn't need:
+
+GitHub repository
+Render
+MongoDB Atlas
+Netlify
+Google Cloud
+
+access.
+
+Their only access should be:
+
+admin.sparkintellect.in
+
+with appropriate permissions.
+
+❌ Don't allow arbitrary file uploads
+
+Don't accept:
+
+.exe
+.php
+.js
+.html
+.svg
+.zip
+.sh
+
+as resumes unless there is an explicit business requirement and a proper security pipeline.
+
+For your internship system, I'd initially accept:
+
+PDF
+DOC
+DOCX
+
+with strict size limits.
+
+❌ Don't permanently delete important records
+
+Don't let ordinary employees permanently delete:
+
+Applications
+Contact enquiries
+Internships
+Employees
+
+Use:
+
+Active
+Inactive
+Closed
+Archived
+
+instead.
+
+Permanent destructive operations should be restricted heavily, ideally to the CEO and/or a controlled technical administrator.
+
+2. The security architecture
+
+Your production architecture should be:
+
+                         INTERNET
+                            │
+                  ┌─────────┴─────────┐
+                  │                   │
+                  ▼                   ▼
+          Public Website          Admin Portal
+             Netlify                 Netlify
+                  │                   │
+                  │ HTTPS             │ HTTPS
+                  └─────────┬─────────┘
+                            ▼
+                       Backend API
+                         Render
+                            │
+                ┌───────────┼────────────┐
+                │           │            │
+                ▼           ▼            ▼
+           MongoDB Atlas   Email      Google APIs
+                │                        │
+                │                        ├── Sheets
+                │                        └── Drive
+                │
+                ▼
+             Data Store
+
+The security boundary is:
+
+PUBLIC INTERNET
+      ↓
+NEXT.JS
+      ↓
+BACKEND SECURITY LAYER
+      ↓
+DATABASE / EXTERNAL SERVICES
+
+The backend is the only trusted gateway to protected resources.
+
+3. Use HTTPS everywhere
+
+Everything should use HTTPS:
+
+https://sparkintellect.in
+https://www.sparkintellect.in
+https://admin.sparkintellect.in
+https://api.sparkintellect.in
+
+Never use production HTTP endpoints.
+
+Also enable:
+
+HSTS
+Secure cookies
+TLS
+HTTPS redirects
+4. Domain architecture
+
+I'd use:
+
+sparkintellect.in
+        ↓
+Public website
+
+admin.sparkintellect.in
+        ↓
+Admin portal
+
+api.sparkintellect.in
+        ↓
+Backend
+
+Don't expose:
+
+mongodb.sparkintellect.in
+
+or any database endpoint publicly.
+
+5. Put Cloudflare in front
+
+For your domain, I'd strongly recommend:
+
+Cloudflare
+
+as the DNS/security layer.
+
+Architecture:
+
+Internet
+   ↓
+Cloudflare
+   ↓
+Netlify
+
+For API:
+
+Internet
+   ↓
+Cloudflare
+   ↓
+Render
+
+Cloudflare can provide:
+
+DNS
+DDoS protection
+WAF
+Bot protection
+Rate limiting
+TLS
+Turnstile
+Security rules
+
+This gives you another security layer before requests reach your application.
+
+6. WAF
+
+Use a Web Application Firewall where appropriate.
+
+The objective isn't:
+
+"Block everything."
+
+It's:
+
+Block obviously malicious traffic before it reaches your application.
+
+Rules can target:
+
+SQL injection patterns
+XSS patterns
+malicious bots
+suspicious requests
+abusive IPs
+excessive request rates
+
+But don't depend solely on WAF.
+
+Your application must still validate everything.
+
+7. Cloudflare Turnstile
+
+Use Turnstile on:
+
+Contact
+Internship application
+Admin login
+Password reset
+
+especially on public forms.
+
+Architecture:
+
+User
+ ↓
+Form
+ ↓
+Turnstile token
+ ↓
+Backend
+ ↓
+Cloudflare verifies token
+ ↓
+Accept / Reject
+
+The backend must verify the token.
+
+Never trust a CAPTCHA result supplied only by the frontend.
+
+8. Rate limiting
+
+This is essential.
+
+At minimum protect:
+
+POST /auth/login
+POST /auth/forgot-password
+POST /contact
+POST /internships/:id/apply
+POST /upload
+
+For example, don't allow someone to make thousands of:
+
+POST /contact
+
+requests.
+
+Use different limits for different endpoints.
+
+Login
+
+Very strict.
+
+Contact
+
+Moderate.
+
+Internship applications
+
+Moderate, with additional duplicate/spam detection.
+
+Public GET requests
+
+More relaxed.
+
+9. Backend security headers
+
+Your Node.js backend should send appropriate security headers.
+
+Use a well-established security middleware such as Helmet where applicable.
+
+Important headers include:
+
+Content-Security-Policy
+Strict-Transport-Security
+X-Content-Type-Options
+Referrer-Policy
+Permissions-Policy
+
+Be careful with CSP rather than blindly copying a configuration, because an overly restrictive CSP can break your legitimate Next.js scripts or integrations.
+
+10. Content Security Policy
+
+CSP is particularly useful against XSS.
+
+Conceptually:
+
+default-src 'self'
+script-src 'self' trusted-sources
+style-src 'self' trusted-sources
+img-src 'self' https: data:
+connect-src 'self' https://api.sparkintellect.in
+
+But your exact CSP should be generated around the actual services you use.
+
+Don't use:
+
+script-src *
+
+as a shortcut.
+
+11. CORS
+
+Your backend should explicitly allow only your websites.
+
+For example:
+
+https://sparkintellect.in
+https://www.sparkintellect.in
+https://admin.sparkintellect.in
+
+Don't use:
+
+Access-Control-Allow-Origin: *
+
+for an authenticated admin API.
+
+12. Authentication
+
+For admin users, implement:
+
+Email
++
+Password
++
+Secure Session
+
+Use:
+
+HttpOnly
+Secure
+SameSite
+
+cookies.
+
+Avoid exposing session tokens to JavaScript whenever possible.
+
+13. Password hashing
+
+Use:
+
+Argon2id
+
+for passwords.
+
+Never store:
+
+password: "mypassword123"
+
+Instead:
+
+passwordHash: "$argon2id$..."
+
+The backend should never need to know the original password after registration.
+
+14. Password policy
+
+For employees:
+
+Strong password requirement
+Minimum length
+Password reset
+Account lockout/rate limiting
+Session expiration
+Ability for CEO to disable account
+
+Don't enforce absurd complexity rules that cause users to write passwords down.
+
+Length is more important than arbitrary symbol requirements.
+
+15. CEO account
+
+The CEO is your highest-value account.
+
+Protect it more strongly than ordinary employees.
+
+I strongly recommend:
+
+MFA
+
+Prefer:
+
+Passkey/WebAuthn
+Hardware security key
+Authenticator app TOTP
+
+rather than relying exclusively on SMS.
+
+So:
+
+CEO
+ ↓
+Password
+ ↓
+MFA
+ ↓
+Admin dashboard
+16. Employee RBAC
+
+Your existing requirement is perfect for RBAC.
+
+Use permissions such as:
+
+internship.read
+internship.create
+internship.update
+internship.publish
+internship.archive
+
+application.read
+application.update
+application.export
+
+contact.read
+contact.update
+
+career.read
+career.create
+career.update
+
+employee.read
+employee.create
+employee.update
+employee.disable
+
+content.read
+content.create
+content.update
+content.publish
+
+audit.read
+settings.manage
+17. Backend authorization
+
+This is critical.
+
+Don't rely on:
+
+if (buttonVisible) {
+    userCanEdit = true
+}
+
+That's not security.
+
+The backend must check:
+
+Request
+ ↓
+Authenticated user?
+ ↓
+Permission?
+ ↓
+Allowed?
+
+Example:
+
+PATCH /api/v1/admin/internships/123
+
+Backend:
+
+Is logged in?
+       ↓
+Is account active?
+       ↓
+Has internship.update?
+       ↓
+YES → update
+NO  → 403
+18. CEO-only operations
+
+These should be extremely restricted:
+
+Create employee
+Delete/disable employee
+Change employee permissions
+Change CEO/system settings
+Manage security settings
+
+Potentially require step-up authentication for the most sensitive actions.
+
+For example:
+
+CEO
+ ↓
+Change employee permissions
+ ↓
+Re-authentication / MFA
+ ↓
+Confirm
+ ↓
+Change
+
+This protects against an unattended admin session being abused.
+
+19. Employee sessions
+
+Use:
+
+Session expiration
+Idle timeout
+Secure cookie
+Session revocation
+Logout from all devices
+Account disable invalidates active sessions
+
+For example:
+
+CEO disables employee
+        ↓
+Employee sessions revoked
+        ↓
+Employee immediately loses access
+20. CSRF protection
+
+If you use cookie-based authentication, carefully protect state-changing requests against CSRF.
+
+Options include:
+
+SameSite cookies
+CSRF tokens where needed
+Origin/Referer validation for sensitive operations
+Proper CORS restrictions
+
+Don't assume CORS itself is CSRF protection.
+
+21. Input validation
+
+Every API endpoint needs server-side validation.
+
+Use:
+
+Zod
+
+or your backend framework's validation system.
+
+For example:
+
+email
+phone
+budget
+internshipId
+application fields
+employee permissions
+
+should all be validated.
+
+Never trust frontend validation.
+
+22. Prevent mass assignment
+
+This is a subtle but important vulnerability.
+
+Don't allow a request like:
+
+{
+  "name": "Arun",
+  "role": "CEO",
+  "permissions": ["*"]
+}
+
+to be blindly passed into MongoDB.
+
+Explicitly decide which fields an endpoint is allowed to modify.
+
+For example:
+
+Employee update endpoint
+allowed:
+name
+department
+status
+
+restricted:
+role
+permissions
+
+Permission changes should have a separate protected endpoint.
+
+23. MongoDB security
+
+MongoDB Atlas should be configured securely.
+
+Use:
+Database authentication
+TLS
+Least-privilege database user
+Network restrictions where practical
+Backups
+Monitoring
+Alerts
+
+Don't use the Atlas owner account from your application.
+
+Create a dedicated application database user with only the permissions it requires.
+
+24. MongoDB connection
+
+Your backend:
+
+MONGODB_URI=mongodb+srv://...
+
+This exists only on Render.
+
+Never:
+
+Next.js
+GitHub
+Browser
+Public JavaScript
+25. MongoDB network access
+
+Ideally restrict database network access as much as your hosting/network architecture allows.
+
+Do not treat:
+
+0.0.0.0/0
+
+as the ideal production configuration.
+
+If your hosting provider's outbound IP ranges make strict IP allowlisting impractical, use the strongest available network controls and compensate with:
+
+strong DB credentials
+least privilege
+TLS
+encryption
+monitoring
+backups
+26. Separate database users
+
+Don't use one superuser for everything.
+
+For example:
+
+Application DB user
+Reporting/integration user
+Migration/admin user
+
+with different privileges where practical.
+
+Your application should not have administrative database privileges.
+
+27. MongoDB indexes
+
+Indexes aren't only about performance.
+
+They can also help enforce data integrity.
+
+For example:
+
+users.email → unique
+internships.slug → unique
+
+This prevents accidental duplicates.
+
+28. Protect Google credentials
+
+This is one of your most sensitive integrations.
+
+Your backend may need:
+
+GOOGLE_SERVICE_ACCOUNT_EMAIL
+GOOGLE_PRIVATE_KEY
+
+or equivalent credentials depending on the integration approach.
+
+These must be:
+
+Render environment variables / secret storage
+
+never:
+
+Next.js
+GitHub
+frontend
+Google Sheet cells
+29. Better: use Google Secret Manager where appropriate
+
+For a more mature production setup, sensitive Google credentials can be managed through a dedicated secret-management system.
+
+But if you're deploying on Render, using Render's encrypted environment/secret configuration can be perfectly reasonable for the initial production system.
+
+The key is:
+
+Secrets must never be committed to source control or exposed to the browser.
+
+30. Google Sheets permissions
+
+Your Google service account should only have access to the spreadsheets it needs.
+
+Don't give it broad access to:
+
+Entire Google Drive
+
+if that isn't necessary.
+
+Use least privilege.
+
+31. Resume security
+
+This is one of the most important areas because resumes contain personal information.
+
+Don't make resumes publicly accessible like:
+
+https://storage.com/resume123.pdf
+
+without access controls.
+
+Prefer:
+
+Admin
+ ↓
+Backend
+ ↓
+Authorize
+ ↓
+Generate short-lived signed URL
+ ↓
+Download
+32. Resume URLs
+
+Use expiring signed URLs.
+
+For example:
+
+valid for 5 minutes
+
+Then the URL becomes useless after expiration.
+
+This prevents someone from sharing a permanent resume link.
+
+33. Resume file scanning
+
+For stronger security, introduce malware scanning for uploads.
+
+Architecture:
+
+Resume
+ ↓
+Upload
+ ↓
+Virus/malware scan
+ ↓
+Clean?
+ ├── YES → storage
+ └── NO  → quarantine/reject
+
+For an early deployment this can be a second-phase security enhancement, but for a production recruitment portal it is worth planning.
+
+34. File upload restrictions
+
+Set:
+
+Maximum file size
+
+For example:
+
+5–10 MB
+
+depending on your requirements.
+
+Allowed:
+
+PDF
+DOC
+DOCX
+
+Don't trust:
+
+filename.pdf
+
+alone.
+
+Validate the actual uploaded file.
+
+35. Filename sanitization
+
+Never save user-provided filenames directly into filesystem paths.
+
+Bad:
+
+../../something
+
+Generate your own storage identifier.
+
+For example:
+
+applicationId/randomUUID
+36. Never execute uploaded files
+
+Uploaded resumes should be treated strictly as data.
+
+Never:
+
+execute
+include
+render as HTML
+
+user-uploaded content on the server.
+
+37. XSS protection
+
+Potential XSS areas include:
+
+Admin rich text
+Internship descriptions
+Case studies
+FAQs
+Candidate answers
+Contact messages
+
+If you allow HTML/rich text, sanitize it server-side.
+
+Never blindly render:
+
+dangerouslySetInnerHTML
+
+with arbitrary user content.
+
+38. MongoDB injection
+
+MongoDB doesn't have SQL injection in the same form as SQL databases, but untrusted query objects can still create serious problems.
+
+Never blindly accept:
+
+req.body
+
+as a MongoDB query/filter/update.
+
+Use strict schemas and sanitize inputs.
+
+For example, an endpoint expecting:
+
+status
+
+should only accept:
+
+new
+reviewing
+shortlisted
+interview
+selected
+rejected
+
+not arbitrary MongoDB operators.
+
+39. API response security
+
+Don't return unnecessary fields.
+
+For example, public:
+
+GET /api/public/internships
+
+should never return:
+
+googleSheetId
+createdBy
+internalNotes
+database IDs you don't need
+admin metadata
+
+Use separate public DTOs/responses.
+
+40. Admin API should expose minimum data
+
+A recruitment employee may not need:
+
+internal audit metadata
+security settings
+employee permissions
+
+Return only what's required for that screen.
+
+This follows:
+
+Least privilege applies to data, not just actions.
+
+41. Audit logging
+
+Record:
+
+Login
+Logout
+Failed login
+Employee creation
+Employee disable
+Permission change
+Internship creation
+Internship update
+Internship publish
+Internship archive
+Application status change
+Contact status change
+Resume access
+Settings changes
+
+But don't put sensitive data into logs.
+
+Never log:
+
+Passwords
+Session tokens
+API keys
+Full resume contents
+42. Tamper-resistant audit logs
+
+Employees shouldn't be able to:
+
+DELETE /audit-logs
+
+Audit logs should be append-oriented.
+
+Ideally:
+
+Employee action
+ ↓
+Audit log
+ ↓
+Employee cannot modify own audit record
+
+CEO can view them.
+
+Deletion should be highly restricted.
+
+43. Login security
+
+Admin login should have:
+
+Rate limiting
+Failed attempt tracking
+MFA for CEO
+Session expiry
+Password reset
+Account status checking
+
+Avoid revealing:
+
+"Email exists but password is wrong."
+
+Instead use generic errors:
+
+"Invalid email or password."
+
+This reduces account enumeration.
+
+44. Password reset
+
+Password reset flow:
+
+Employee
+ ↓
+Forgot password
+ ↓
+Backend
+ ↓
+Generate random one-time token
+ ↓
+Email
+ ↓
+Reset page
+ ↓
+Validate token
+ ↓
+Set new password
+ ↓
+Invalidate token
+
+Reset tokens should:
+
+Be cryptographically random
+Expire quickly
+Be one-time use
+Never be stored in plaintext if avoidable
+45. Don't email passwords
+
+Never:
+
+Your password is: XXXXXX
+
+Instead:
+
+You've been invited to SparkIntellect Admin.
+
+Set your password here:
+[secure link]
+46. API secrets
+
+Your .env should contain secrets only where required.
+
+A production backend might have categories like:
+
+# Application
+NODE_ENV=production
+PORT=...
+
+# Database
+MONGODB_URI=...
+
+# Authentication
+SESSION_SECRET=...
+CSRF_SECRET=...
+
+# Email
+RESEND_API_KEY=...
+
+# Google
+GOOGLE_SERVICE_ACCOUNT_EMAIL=...
+GOOGLE_PRIVATE_KEY=...
+
+# Storage
+STORAGE_ENDPOINT=...
+STORAGE_ACCESS_KEY=...
+STORAGE_SECRET_KEY=...
+STORAGE_BUCKET=...
+
+# Cloudflare
+TURNSTILE_SECRET_KEY=...
+
+# Monitoring
+SENTRY_DSN=...
+
+Exact variables depend on the libraries/services you choose.
+
+47. Frontend .env
+
+The frontend should contain only non-secret configuration.
+
+For example:
+
+NEXT_PUBLIC_API_URL=https://api.sparkintellect.in
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=...
+
+A Turnstile site key is public by design.
+
+The secret key stays on the backend.
+
+48. .gitignore
+
+At minimum, your root .gitignore should exclude:
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Next.js
+.next/
+out/
+.vercel/
+
+# Build
+dist/
+build/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+
+# Temporary files
+tmp/
+temp/
+
+# Local uploads
+uploads/
+
+# Certificates / keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Service account credentials
+service-account*.json
+google-credentials*.json
+credentials*.json
+
+# Secrets
+secrets/
+private/
+49. Important .gitignore rule
+
+Don't do:
+
+.env*
+
+and assume everything is solved.
+
+You should still maintain:
+
+.env.example
+
+with fake/example values only.
+
+For example:
+
+MONGODB_URI=
+SESSION_SECRET=
+RESEND_API_KEY=
+GOOGLE_SERVICE_ACCOUNT_EMAIL=
+GOOGLE_PRIVATE_KEY=
+
+No real credentials.
+
+50. GitHub secret scanning
+
+Enable GitHub's security features where available:
+
+Secret scanning
+Push protection
+Dependabot
+Dependency alerts
+Code scanning
+
+This can catch accidentally committed secrets or vulnerable dependencies.
+
+51. If a secret is ever committed
+
+This is critical.
+
+Don't simply:
+
+git rm .env
+
+and assume the secret is safe.
+
+Git history may still contain it.
+
+Immediately:
+
+Revoke credential
+Generate new credential
+Update production secret
+Remove compromised credential
+
+Then clean the repository history if necessary.
+
+The secret is considered compromised once committed.
+
+52. Never put secrets in GitHub Actions logs
+
+Be careful with:
+
+echo $SECRET
+
+or debugging environment variables.
+
+A secret can accidentally become visible in CI logs.
+
+53. Dependency security
+
+Your Next.js and Node.js projects will have many dependencies.
+
+Regularly run:
+
+npm audit
+
+and keep dependencies updated.
+
+But don't blindly run major upgrades directly in production.
+
+Use:
+
+Update
+ ↓
+Test
+ ↓
+Security review
+ ↓
+Deploy
+54. Lock dependencies
+
+Commit:
+
+package-lock.json
+
+or the appropriate lockfile.
+
+Use deterministic installs in CI.
+
+This prevents "works on my machine" dependency differences.
+
+55. Don't install unnecessary packages
+
+Every dependency increases attack surface.
+
+If you need:
+
+date formatting
+
+don't install a giant library unless necessary.
+
+More packages = more potential vulnerabilities.
+
+56. Keep Next.js updated
+
+Your frontend framework should be kept on supported versions.
+
+Security vulnerabilities can occur in:
+
+Next.js
+React
+Node.js
+Image processing libraries
+Authentication libraries
+
+Use automated dependency alerts.
+
+57. Node.js production configuration
+
+Run the backend in production mode:
+
+NODE_ENV=production
+
+Don't expose verbose stack traces to users.
+
+Development:
+
+full stack trace
+
+Production:
+
+Generic error
+Request ID
+
+Detailed error goes to Sentry/logging.
+
+58. Error handling
+
+Bad:
+
+MongoServerError:
+mongodb+srv://username:password@...
+
+returned to the browser.
+
+Good:
+
+Something went wrong.
+Reference ID: 8D4K...
+
+Backend logs the actual error internally.
+
+59. Request IDs
+
+Give each request a unique ID.
+
+For example:
+
+Request ID:
+req_7H3K92
+
+Then:
+
+User sees:
+Something went wrong. Reference req_7H3K92.
+
+Developer:
+Search logs for req_7H3K92.
+
+This is extremely useful in production.
+
+60. Database backups
+
+MongoDB Atlas should have automated backups enabled.
+
+But don't stop there.
+
+You should have a recovery strategy:
+
+Database
+ ↓
+Automated backup
+ ↓
+Recovery testing
+
+A backup you've never tested is not a reliable disaster-recovery plan.
+
+61. Disaster recovery
+
+Define:
+
+RPO
+
+How much data can you afford to lose?
+
+RTO
+
+How quickly must the system recover?
+
+For your application, you could establish reasonable targets based on business needs.
+
+62. Monitoring
+
+Monitor:
+
+Backend uptime
+API errors
+MongoDB health
+Response times
+Failed logins
+Application failures
+Email failures
+Google Sheets sync failures
+File upload failures
+
+Use something like:
+
+Sentry for application errors.
+
+Your hosting provider can handle basic uptime monitoring, with additional monitoring if needed.
+
+63. Google Sheets failure handling
+
+Don't do:
+
+Save MongoDB
+ ↓
+Google Sheets fails
+ ↓
+Delete application
+
+Instead:
+
+MongoDB
+ ↓
+Application saved
+ ↓
+Google Sheets sync
+ ↓
+Success / Pending / Failed
+
+Then retry.
+
+This is both a reliability and security consideration.
+
+64. Email failure handling
+
+Same idea.
+
+Application should remain stored even if:
+
+Email provider temporarily unavailable
+
+Store:
+
+notificationStatus
+
+and retry.
+
+65. Admin panel shouldn't expose infrastructure
+
+The admin UI should not show:
+
+MongoDB URI
+Google credentials
+Render credentials
+Netlify tokens
+API keys
+
+Even to normal employees.
+
+The admin panel controls business operations, not infrastructure secrets.
+
+66. Separate environments
+
+Use:
+
+Development
+Staging
+Production
+
+at least conceptually.
+
+For example:
+
+MongoDB
+ ├── spark-dev
+ ├── spark-staging
+ └── spark-production
+
+Don't let developers test against your production database.
+
+67. Separate Google Sheets environments
+
+Likewise:
+
+Development → test sheets
+Staging → staging sheets
+Production → production sheets
+
+Don't accidentally send test applications into your real recruitment sheet.
+
+68. Separate email environments
+
+Development should not send fake emails to your CEO every time a developer tests the contact form.
+
+Use:
+
+Development → test inbox
+Staging → controlled inbox
+Production → company inbox
+69. Production database access
+
+Developers shouldn't routinely have unrestricted production DB access.
+
+Better:
+
+Developer
+ ↓
+Application
+ ↓
+Logs / admin tools
+
+rather than:
+
+Developer
+ ↓
+Production MongoDB owner account
+
+Use temporary, controlled access when necessary.
+
+70. Protect the admin domain
+
+The admin portal is a much more sensitive application than the public website.
+
+I'd consider additional controls such as:
+
+MFA
+Strict CSP
+Strong session controls
+IP restrictions for particularly sensitive environments, if operationally practical
+Cloudflare Access for internal-only tools, where appropriate
+
+Don't add IP restrictions blindly if employees need to work from different networks.
+
+71. Admin frontend should never contain permissions as the security source
+
+It's fine for the UI to hide:
+
+Create Employee
+
+when the employee lacks permission.
+
+But the backend still has to enforce it.
+
+Think:
+
+Frontend permission check
+= UX
+
+Backend permission check
+= SECURITY
+72. Prevent IDOR
+
+A major API vulnerability is:
+
+Insecure Direct Object Reference.
+
+Example:
+
+Employee has access to application:
+
+/application/123
+
+They manually change:
+
+/application/124
+
+and see another restricted record.
+
+Every backend request must verify:
+
+Does this user have permission to access THIS resource?
+
+Not merely:
+
+Does this user have application.read?
+
+This becomes especially important if later you introduce departments or scoped employee access.
+
+73. Data-level permissions
+
+You can eventually go beyond simple RBAC.
+
+For example:
+
+Recruitment employee
+→ Applications
+
+Internship employee
+→ Internship applications
+
+Finance employee
+→ Billing
+
+CEO
+→ Everything
+
+So permission can become:
+
+Action
++
+Resource
++
+Scope
+
+This is more secure as the company grows.
+
+74. Prevent privilege escalation
+
+An employee must never be able to submit:
+
+{
+  "permissions": ["*"]
+}
+
+and promote themselves.
+
+The backend should have explicit authorization for permission changes.
+
+Even if the employee modifies the request manually, it must fail.
+
+75. CEO account recovery
+
+Think about what happens if the CEO loses access.
+
+Have:
+
+Recovery email
+MFA recovery codes
+Backup authentication method
+Emergency recovery procedure
+
+Don't build a system where one lost phone means the company loses its entire admin system.
+
+76. Don't expose MongoDB ObjectIds unnecessarily
+
+It's not a major security mechanism by itself, but for public APIs I'd use public identifiers/slugs where appropriate.
+
+For example:
+
+/internships/ai-full-stack-development
+
+rather than exposing internal implementation details everywhere.
+
+77. Database encryption
+
+MongoDB Atlas provides encryption capabilities.
+
+Use:
+
+Encryption in transit
+Encryption at rest
+Strong authentication
+
+For highly sensitive data, evaluate field-level encryption where justified.
+
+You probably don't need to encrypt every field individually.
+
+78. Minimize personal data
+
+Don't collect information simply because you can.
+
+For internship applications, ask:
+
+Name
+Email
+Phone
+College
+Qualification
+Resume
+Relevant links
+Required application questions
+
+Avoid collecting unnecessary sensitive personal information.
+
+This reduces the consequences of a breach.
+
+79. Data retention
+
+Create a policy for:
+
+Applications
+Contact enquiries
+Resumes
+Audit logs
+Inactive employees
+
+For example:
+
+Applications → retain according to recruitment/legal needs
+Resumes → delete after defined retention period
+Contacts → retain while business-relevant
+Audit logs → longer retention
+
+Your privacy policy should reflect the actual policy.
+
+80. Don't expose candidate information publicly
+
+Obviously:
+
+/api/public/applications
+
+should not exist.
+
+Candidate information must only be available to authorized admin users.
+
+81. Don't expose contact submissions publicly
+
+Same principle.
+
+No public endpoint should return:
+
+all contacts
+
+or:
+
+all applications
+82. Prevent scraping
+
+You can't make public website data impossible to scrape.
+
+But you can protect private data through:
+
+Authentication
+Authorization
+Rate limiting
+WAF
+No sensitive information in public API responses
+83. SEO vs security
+
+Your public internship details can be indexed:
+
+/internships/ai-full-stack-development
+
+But candidate applications must not be indexable.
+
+Ensure private/admin pages have appropriate:
+
+noindex
+
+and authentication protection.
+
+Security should never rely on robots.txt.
+
+84. Admin routes
+
+Don't rely on:
+
+/admin-secret-url
+
+as security.
+
+Even if someone knows:
+
+admin.sparkintellect.in
+
+they should still face:
+
+Authentication
++
+Authorization
++
+MFA where appropriate
+85. Secrets rotation
+
+Have a process for rotating:
+
+MongoDB credentials
+Session secrets
+Google credentials
+Email API keys
+Storage credentials
+Turnstile secrets
+
+Don't create one secret in 2026 and assume it should remain unchanged forever.
+
+86. If an employee leaves
+
+CEO should be able to:
+
+Disable employee
+ ↓
+Revoke sessions
+ ↓
+Remove permissions
+ ↓
+Revoke relevant external access
+ ↓
+Audit event
+
+The employee shouldn't retain access after leaving the company.
+
+87. If the admin frontend is compromised
+
+Your architecture should limit the damage.
+
+Suppose someone compromises the admin frontend.
+
+They still shouldn't automatically get:
+
+MongoDB credentials
+Google credentials
+Render credentials
+
+because those are never in the frontend.
+
+They would still have to defeat the backend's authorization.
+
+This is why the architecture matters more than .gitignore.
+
+88. If an API key is leaked
+
+Have a response plan:
+
+Detect
+ ↓
+Revoke
+ ↓
+Rotate
+ ↓
+Review logs
+ ↓
+Identify exposure
+ ↓
+Patch
+ ↓
+Deploy
+
+Don't just change the .env file.
+
+89. Production security layers
+
+Your final security stack should look like:
+
+                   INTERNET
+                       │
+                       ▼
+                  CLOUDFLARE
+              ┌────────┼─────────┐
+              │        │         │
+             WAF     DDoS     Turnstile
+              │
+              ▼
+            NETLIFY
+              │
+         Next.js Apps
+              │
+              ▼
+           HTTPS/API
+              │
+              ▼
+         NODE.JS API
+              │
+      ┌───────┼────────┐
+      │       │        │
+     Auth    RBAC   Validation
+      │       │        │
+      └───────┼────────┘
+              │
+       Rate Limiting
+              │
+              ▼
+          Business Logic
+              │
+       ┌──────┼─────────┐
+       ▼      ▼         ▼
+    MongoDB  Storage   APIs
+      Atlas             │
+       │          ┌────┴─────┐
+       │          ▼          ▼
+       │       Google      Email
+       │
+       ▼
+    Encryption
+    Backups
+    Monitoring
+90. Your .env strategy
+
+I'd separate configuration into:
+
+Backend .env
+NODE_ENV=production
+
+PORT=
+
+APP_URL=https://sparkintellect.in
+ADMIN_URL=https://admin.sparkintellect.in
+API_URL=https://api.sparkintellect.in
+
+MONGODB_URI=
+
+SESSION_SECRET=
+
+RESEND_API_KEY=
+MAIL_FROM=
+CONTACT_NOTIFICATION_EMAIL=
+
+GOOGLE_SERVICE_ACCOUNT_EMAIL=
+GOOGLE_PRIVATE_KEY=
+
+STORAGE_ENDPOINT=
+STORAGE_ACCESS_KEY=
+STORAGE_SECRET_KEY=
+STORAGE_BUCKET=
+
+TURNSTILE_SECRET_KEY=
+
+SENTRY_DSN=
+Frontend
+NEXT_PUBLIC_API_URL=https://api.sparkintellect.in
+
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=
+
+Again:
+
+exact names depend on your implementation.
+
+91. .gitignore strategy
+
+Your repository should protect:
+
+.env
+.env.local
+.env.production
+.env.development
+
+*.pem
+*.key
+*.p12
+*.pfx
+
+credentials/
+secrets/
+private/
+
+service-account*.json
+google-credentials*.json
+
+node_modules/
+.next/
+dist/
+coverage/
+uploads/
+logs/
+
+But commit:
+
+.env.example
+package-lock.json
+
+and configuration templates that contain no real secrets.
+
+92. What I would consider "mandatory" for launch
+
+Before you call this production-ready, I'd consider these non-negotiable:
+
+🔴 Authentication
+Secure admin authentication
+Strong password hashing
+Secure cookies
+Session expiration
+Password reset
+🔴 Authorization
+RBAC
+Backend permission checks
+CEO-only employee management
+No privilege escalation
+🔴 API security
+Validation
+Rate limiting
+CORS
+Security headers
+CSRF protection where applicable
+Generic production errors
+🔴 Database
+MongoDB Atlas
+TLS
+Least privilege
+Backups
+Monitoring
+Restricted network access where practical
+🔴 Files
+File type validation
+File size limits
+Secure storage
+Private resume access
+🔴 Public forms
+Turnstile
+Rate limiting
+Validation
+Spam protection
+🔴 Secrets
+Environment/secret management
+No credentials in Git
+GitHub secret scanning
+Credential rotation
+🔴 Monitoring
+Error tracking
+Structured logging
+Health checks
+Alerts
+93. Strongly recommended after launch
+
+Then add:
+
+Passkeys/WebAuthn
+Malware scanning for resumes
+Advanced WAF rules
+Data retention automation
+Security audit
+Dependency automation
+Penetration testing
+External security review
+Disaster recovery drills
+94. What you can safely avoid initially
+
+To prevent overengineering, you do not need to immediately introduce:
+
+Kubernetes
+Microservices
+Kafka
+Elasticsearch
+Multiple databases
+Redis cluster
+Complex service mesh
+Dedicated SIEM
+Zero-trust enterprise network
+
+Those would add complexity without giving your current website proportional benefit.
+
+A well-designed:
+
+Next.js + Node.js + MongoDB Atlas + Netlify + Render + Cloudflare + secure storage + email + Google APIs
+
+system can be very secure.
+
+95. The most important security principle
+
+Don't think:
+
+.env + .gitignore = secure website
+
+They are only a small part of the picture.
+
+Your actual security comes from:
+
+Secure architecture
+       +
+Authentication
+       +
+Authorization
+       +
+Input validation
+       +
+Least privilege
+       +
+Secret management
+       +
+Network controls
+       +
+File security
+       +
+Monitoring
+       +
+Backups
+       +
+Incident response
+96. Final security architecture I recommend for SparkIntellect
+                         INTERNET
+                            │
+                            ▼
+                       CLOUDFLARE
+                    WAF / DDoS / DNS
+                            │
+                ┌───────────┴───────────┐
+                ▼                       ▼
+         PUBLIC WEBSITE            ADMIN PORTAL
+            Netlify                  Netlify
+           Next.js                  Next.js
+                │                       │
+                └───────────┬───────────┘
+                            │
+                           HTTPS
+                            │
+                            ▼
+                      BACKEND API
+                         Render
+                      Node.js/TS
+                       NestJS
+                            │
+              ┌─────────────┼─────────────┐
+              │             │             │
+              ▼             ▼             ▼
+        Authentication     RBAC        Validation
+              │             │             │
+              └─────────────┼─────────────┘
+                            │
+                      Rate Limiting
+                            │
+                            ▼
+                      Business Logic
+                            │
+             ┌──────────────┼──────────────┐
+             ▼              ▼              ▼
+       MongoDB Atlas    File Storage    Integrations
+             │                             │
+       Encryption/Backup          ┌────────┼─────────┐
+                                  ▼        ▼         ▼
+                              Google    Sheets    Email
+                              APIs
+
+And the golden rule for the entire project should be:
+
+The browser is untrusted. The backend is the security boundary. MongoDB and external service credentials are private. Every privileged operation is authenticated, authorized, validated, logged and rate-limited.
+
+If you build the SparkIntellect platform this way, you're not merely protecting it from a basic "hacking attempt"; you're designing it so that a compromised frontend, leaked employee password, malicious form submission, stolen session, exposed API endpoint, or failed third-party integration has a limited blast radius. That's the standard I'd aim for before putting the new internship/admin system into production.

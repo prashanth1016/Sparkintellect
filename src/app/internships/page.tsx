@@ -1,12 +1,14 @@
-"use client";
-
-import React, { useState } from "react";
+import React from "react";
+import { Metadata } from "next";
+import Link from "next/link";
 import { BackgroundGrid } from "@/components/ui/BackgroundGrid";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 import { FloatingCTA } from "@/components/ui/FloatingCTA";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SectionWrapper, GridStaggerItem } from "@/components/ui/SectionWrapper";
+import { publicApi, InternshipItem } from "@/lib/api";
+import { INTERNSHIP_DOMAINS } from "@/data/companyData";
 import { 
   GraduationCap, 
   Briefcase, 
@@ -16,114 +18,78 @@ import {
   ArrowRight, 
   Sparkles, 
   Bot, 
-  Code2, 
-  Smartphone, 
-  LineChart, 
-  Palette, 
-  Cloud, 
-  Zap, 
-  Send,
-  Calendar,
+  Calendar, 
+  MapPin,
   Building,
-  Check
+  Globe,
+  Smartphone,
+  Cloud,
+  Layout,
+  AlertTriangle,
+  RefreshCw
 } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Internship Programs in Chennai | SparkIntellect",
+  description:
+    "Launch your technology career with SparkIntellect. Real production projects in AI/ML, Full-Stack Web Development, and Mobile Engineering in Guindy, Chennai.",
+};
+
+const DOMAIN_ICONS: Record<string, React.ElementType> = {
+  Bot: Bot,
+  Globe: Globe,
+  Smartphone: Smartphone,
+  Cloud: Cloud,
+  Layout: Layout,
+};
 
 const WHY_INTERN = [
   {
-    title: "Live Production Projects",
-    desc: "Work on real enterprise applications, AI pipelines, and client solutions deployed in production.",
+    title: "Live Production Systems",
+    desc: "Work on genuine client applications, AI pipelines, and software platforms deployed in production.",
     icon: Briefcase,
   },
   {
     title: "1-on-1 Senior Mentorship",
-    desc: "Direct guidance from Founder Prashanth S and senior lead developers in Guindy, Chennai.",
+    desc: "Direct guidance from Founder Prashanth S and senior lead architects in Guindy, Chennai.",
     icon: Users,
   },
   {
     title: "Modern AI & Tech Stack",
-    desc: "Gain hands-on experience in Next.js, Python LLMs, React Native, AWS Docker, and automation.",
+    desc: "Hands-on engineering with Next.js, Python LLMs, TypeScript, Docker, and workflow automation.",
     icon: Bot,
   },
   {
     title: "Official Certification & LOR",
-    desc: "Receive a verified Internship Certificate and Letter of Recommendation based on performance.",
+    desc: "Receive a verified SparkIntellect Internship Certificate and Letter of Recommendation.",
     icon: Award,
   },
   {
-    title: "Flexible Tenure (2–6 Months)",
-    desc: "Custom duration options designed to align smoothly with your college semester guidelines.",
-    icon: Calendar,
+    title: "Pre-Placement Offer (PPO)",
+    desc: "Top performing interns receive fast-tracked full-time software engineering offers.",
+    icon: Sparkles,
   },
   {
-    title: "Remote / Hybrid / On-site",
-    desc: "Choose between flexible remote execution, hybrid work, or on-site experience in Chennai.",
-    icon: Building,
+    title: "Flexible Tenure & Mode",
+    desc: "3 to 6-month tenures available with remote, hybrid, or on-site execution in Chennai.",
+    icon: Calendar,
   },
 ];
 
-const DOMAINS = [
-  { name: "AI & Machine Learning", desc: "LLMs, RAG, Chatbots, PyTorch & OpenCV", icon: Bot },
-  { name: "Web Development (Full Stack)", desc: "Next.js 14, React, TypeScript & Tailwind CSS", icon: Code2 },
-  { name: "Mobile App Development", desc: "Flutter, React Native & Native Android/iOS", icon: Smartphone },
-  { name: "Data Science & Analytics", desc: "Data pipelines, predictive analytics & SQL", icon: LineChart },
-  { name: "UI/UX Design & Research", desc: "Figma wireframing, design systems & prototyping", icon: Palette },
-  { name: "DevOps & Cloud Systems", desc: "AWS, Docker, CI/CD pipelines & Linux admin", icon: Cloud },
-  { name: "Business Automation & AI Agents", desc: "n8n, Zapier, WhatsApp CRM & Python bots", icon: Zap },
-];
+export default async function InternshipsPage() {
+  let internships: InternshipItem[] = [];
+  let fetchError = false;
 
-const STEPS = [
-  { num: 1, title: "Submit Form", desc: "Fill out the online internship enquiry form below." },
-  { num: 2, title: "Screening Call", desc: "Short 15-min call with our engineering lead to discuss your goals." },
-  { num: 3, title: "Practical Task", desc: "Small hands-on assignment matching your domain interest." },
-  { num: 4, title: "Offer & Onboarding", desc: "Official internship offer letter and team onboarding." },
-];
+  try {
+    internships = await publicApi.getInternships();
+  } catch (err) {
+    fetchError = true;
+    internships = [];
+  }
 
-const COURSE_OPTIONS = [
-  "AI & Machine Learning",
-  "Web Development (Full Stack)",
-  "Mobile App Development (React Native / Flutter)",
-  "Data Science & Analytics",
-  "UI/UX Design",
-  "DevOps & Cloud",
-  "Business Automation & AI Agents",
-  "Other (specify in message)",
-];
-
-export default function InternshipsPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    education: "",
-    college: "",
-    year: "",
-    course: COURSE_OPTIONS[0],
-    domain: DOMAINS[0].name,
-    duration: "3–4 months",
-    mode: "Hybrid",
-    message: "",
-  });
-
-  const [redirecting, setRedirecting] = useState(false);
-
-  const handleApply = (e: React.FormEvent) => {
-    e.preventDefault();
-    setRedirecting(true);
-
-    const messageText = `Hi SparkIntellect, I'm interested in an internship.\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nEducation: ${formData.education}\nCollege: ${formData.college}\nYear of Study: ${formData.year}\nCourse: ${formData.course}\nDomain: ${formData.domain}\nDuration: ${formData.duration}\nMode: ${formData.mode}\nMessage: ${formData.message}`;
-
-    const whatsappUrl = `https://wa.me/918977177634?text=${encodeURIComponent(messageText)}`;
-
-    setTimeout(() => {
-      window.open(whatsappUrl, "_blank");
-      setRedirecting(false);
-    }, 800);
-  };
-
-  const scrollToForm = () => {
-    const el = document.getElementById("apply-form");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
+  const openInternships = internships.filter(
+    (i) => i.published && i.status === "open"
+  );
 
   return (
     <div className="relative min-h-screen bg-white text-[#0B1220] selection:bg-[#9FCFFB] selection:text-[#0B1220]">
@@ -131,7 +97,6 @@ export default function InternshipsPage() {
       <Navbar />
 
       <main className="relative z-10 pt-32 pb-24">
-        
         {/* HERO SECTION */}
         <SectionWrapper className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest bg-[#D6EBFF] border border-[#BEE0FF] text-[#0B1220] mb-6">
@@ -140,33 +105,207 @@ export default function InternshipsPage() {
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-serif text-[#0B1220] max-w-4xl mx-auto leading-tight mb-6">
-            Build Real Production Experience at{" "}
-            <span className="text-gradient-navy italic">SparkIntellect</span>
+            Learn by Building Real{" "}
+            <span className="text-gradient-navy italic font-serif">Production Software</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-[#334155] max-w-3xl mx-auto leading-relaxed mb-8">
-            Gain hands-on real-world experience in Artificial Intelligence, Full-Stack Web Development, Mobile Engineering, Cloud Infrastructure, and Business Automation.
+            Gain intensive, real-world engineering depth in Artificial Intelligence, Full-Stack Web Applications, Mobile Platforms, and Cloud Infrastructure with 1-on-1 mentorship in Chennai.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              onClick={scrollToForm}
+            <a
+              href="#open-tracks"
               className="px-8 py-4 rounded-full font-bold text-sm bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-lg shadow-[#9FCFFB]/30 hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
             >
-              <span>Apply for Internship</span>
+              <span>View Open Opportunities ({openInternships.length})</span>
               <ArrowRight className="w-4 h-4" />
-            </button>
-            <a
-              href={`tel:+918977177634`}
+            </a>
+            <Link
+              href="/contact"
               className="px-8 py-4 rounded-full font-semibold text-sm bg-[#F2F9FF] text-[#0B1220] border border-[#BEE0FF] hover:bg-[#D6EBFF] transition-all"
             >
               Contact Internship Desk
-            </a>
+            </Link>
           </div>
         </SectionWrapper>
 
+        {/* OPEN OPPORTUNITIES GRID */}
+        <SectionWrapper id="open-tracks" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24 scroll-mt-28">
+          <SectionHeading
+            badge="Current Openings"
+            title="Available Internship"
+            highlightTitle="Opportunities"
+            subtitle="Explore our active engineering tracks. Applications are screened on a rolling basis."
+          />
+
+          {fetchError ? (
+            <div className="luxury-card p-10 rounded-3xl border border-rose-200 bg-rose-50/50 text-center max-w-lg mx-auto space-y-4 shadow-sm">
+              <AlertTriangle className="w-10 h-10 text-rose-600 mx-auto" />
+              <h3 className="text-lg font-serif font-bold text-[#0B1220]">
+                Unable to load current internships
+              </h3>
+              <p className="text-xs text-[#334155] leading-relaxed">
+                We are experiencing a temporary connection issue. Please refresh or try again in a few moments.
+              </p>
+              <Link
+                href="/internships"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-xs bg-[#0B1220] text-white hover:bg-slate-800 transition-colors shadow-md"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Try Again</span>
+              </Link>
+            </div>
+          ) : openInternships.length === 0 ? (
+            /* Clean Empty State */
+            <div className="space-y-12">
+              <div className="luxury-card p-10 sm:p-14 rounded-3xl border border-[#BEE0FF] bg-gradient-to-br from-white via-[#F2F9FF] to-white text-center max-w-2xl mx-auto space-y-4 shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-[#D6EBFF] text-[#0284c7] flex items-center justify-center mx-auto shadow-inner">
+                  <GraduationCap className="w-7 h-7" />
+                </div>
+                
+                <h3 className="text-2xl font-serif font-bold text-[#0B1220]">
+                  No Current Internship Openings
+                </h3>
+                
+                <p className="text-xs sm:text-sm text-[#334155] max-w-md mx-auto leading-relaxed">
+                  Applications for our current internship cohorts are closed at the moment. New opportunities will be published here when applications reopen.
+                </p>
+                
+                <div className="pt-2">
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-xs bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-md transition-all"
+                  >
+                    <span>Submit General Talent Enquiry</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Informational Internship Domains Section */}
+              <div className="pt-10 border-t border-[#BEE0FF]">
+                <div className="text-center max-w-2xl mx-auto mb-10">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-[#D6EBFF] text-[#0284c7] mb-3">
+                    <span>What We Offer</span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#0B1220]">
+                    Internship Domains & Engineering Tracks
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#334155] mt-2">
+                    SparkIntellect provides hands-on technical training and mentorship across core technology disciplines.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {INTERNSHIP_DOMAINS.map((domain, idx) => {
+                    const Icon = DOMAIN_ICONS[domain.iconName] || Bot;
+                    return (
+                      <GridStaggerItem key={domain.title} index={idx}>
+                        <div className="luxury-card p-6 sm:p-7 rounded-3xl border border-[#BEE0FF] bg-white h-full flex flex-col justify-between shadow-sm">
+                          <div>
+                            <div className="w-11 h-11 rounded-2xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center mb-4 text-[#0284c7]">
+                              <Icon className="w-5 h-5" />
+                            </div>
+
+                            <h4 className="text-lg font-serif font-bold text-[#0B1220] mb-2">
+                              {domain.title}
+                            </h4>
+
+                            <p className="text-xs text-[#334155] leading-relaxed mb-4">
+                              {domain.description}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap gap-1.5 pt-3 border-t border-[#BEE0FF]/60">
+                            {domain.skills.map((skill) => (
+                              <span
+                                key={skill}
+                                className="px-2 py-0.5 rounded-full bg-[#F2F9FF] border border-[#BEE0FF] text-[10px] font-mono text-[#0B1220]"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </GridStaggerItem>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Active Real MongoDB Internship Openings */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {openInternships.map((internship, idx) => (
+                <GridStaggerItem key={internship._id || internship.slug} index={idx}>
+                  <div className="luxury-card luxury-card-hover rounded-3xl border border-[#BEE0FF] p-8 h-full flex flex-col justify-between bg-white shadow-sm">
+                    <div className="space-y-4">
+                      {/* Top status */}
+                      <div className="flex items-center justify-between border-b border-[#BEE0FF] pb-3">
+                        <span className="text-[10px] font-mono font-bold uppercase text-emerald-700 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200">
+                          {internship.status.toUpperCase()}
+                        </span>
+                        <span className="text-xs font-mono text-[#334155]">
+                          {internship.duration}
+                        </span>
+                      </div>
+
+                      <h3 className="text-2xl font-serif font-bold text-[#0B1220] leading-snug">
+                        {internship.title}
+                      </h3>
+
+                      <p className="text-xs text-[#334155] leading-relaxed line-clamp-3">
+                        {internship.shortDescription}
+                      </p>
+
+                      <div className="p-3 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF] space-y-1 text-xs">
+                        <div className="flex items-center gap-1.5 text-[#0B1220]">
+                          <MapPin className="w-3.5 h-3.5 text-[#0284c7]" />
+                          <span><strong>Mode:</strong> {internship.mode}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[#0B1220]">
+                          <Award className="w-3.5 h-3.5 text-[#0284c7]" />
+                          <span><strong>Stipend:</strong> {internship.stipend}</span>
+                        </div>
+                      </div>
+
+                      {internship.skills && internship.skills.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {internship.skills.slice(0, 3).map((skill) => (
+                            <span key={skill} className="px-2 py-0.5 rounded-full bg-[#F2F9FF] border border-[#BEE0FF] text-[10px] font-mono text-[#0B1220]">
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-6 mt-6 border-t border-[#BEE0FF] flex items-center justify-between gap-2">
+                      <Link
+                        href={`/internships/${internship.slug}`}
+                        className="text-xs font-bold text-[#334155] hover:text-[#0B1220] transition-colors"
+                      >
+                        View Details
+                      </Link>
+
+                      <Link
+                        href={`/internships/${internship.slug}/apply`}
+                        className="px-5 py-2.5 rounded-full font-bold text-xs bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-md flex items-center gap-1.5 transition-all"
+                      >
+                        <span>Apply Now</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                </GridStaggerItem>
+              ))}
+            </div>
+          )}
+        </SectionWrapper>
+
         {/* WHY INTERN WITH US */}
-        <SectionWrapper className="bg-[#F2F9FF] py-20 border-y border-[#BEE0FF] mb-20">
+        <SectionWrapper className="bg-[#F2F9FF] py-20 border-y border-[#BEE0FF] mb-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <SectionHeading
               badge="Growth & Mentorship"
@@ -180,15 +319,15 @@ export default function InternshipsPage() {
                 const Icon = item.icon;
                 return (
                   <GridStaggerItem key={item.title} index={idx}>
-                    <div className="luxury-card luxury-card-hover p-7 rounded-2xl border border-[#BEE0FF] h-full flex flex-col justify-between">
+                    <div className="luxury-card luxury-card-hover p-7 rounded-2xl border border-[#BEE0FF] h-full flex flex-col justify-between bg-white shadow-sm">
                       <div>
-                        <div className="w-12 h-12 rounded-xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center mb-5 text-[#0B1220]">
-                          <Icon className="w-6 h-6 text-[#0284c7]" />
+                        <div className="w-12 h-12 rounded-xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center mb-5 text-[#0284c7]">
+                          <Icon className="w-6 h-6" />
                         </div>
                         <h3 className="text-lg font-serif font-bold text-[#0B1220] mb-2">
                           {item.title}
                         </h3>
-                        <p className="text-sm text-[#334155] leading-relaxed">
+                        <p className="text-xs text-[#334155] leading-relaxed">
                           {item.desc}
                         </p>
                       </div>
@@ -197,274 +336,6 @@ export default function InternshipsPage() {
                 );
               })}
             </div>
-          </div>
-        </SectionWrapper>
-
-        {/* AVAILABLE DOMAINS */}
-        <SectionWrapper className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
-          <SectionHeading
-            badge="Specialization Tracks"
-            title="Available Internship"
-            highlightTitle="Domains"
-            subtitle="Select your preferred technology track to work alongside senior developers and architects."
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {DOMAINS.map((domain, idx) => {
-              const Icon = domain.icon;
-              return (
-                <GridStaggerItem key={domain.name} index={idx}>
-                  <div className="luxury-card luxury-card-hover p-6 rounded-2xl border border-[#BEE0FF] space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#F2F9FF] border border-[#BEE0FF] flex items-center justify-center shrink-0">
-                        <Icon className="w-5 h-5 text-[#0284c7]" />
-                      </div>
-                      <h3 className="text-base font-bold text-[#0B1220]">{domain.name}</h3>
-                    </div>
-                    <p className="text-xs text-[#334155] leading-relaxed">{domain.desc}</p>
-                    <button
-                      onClick={() => {
-                        setFormData({ ...formData, domain: domain.name, course: domain.name });
-                        scrollToForm();
-                      }}
-                      className="text-xs font-semibold text-[#0284c7] hover:underline flex items-center gap-1"
-                    >
-                      <span>Select Track & Apply</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                </GridStaggerItem>
-              );
-            })}
-          </div>
-        </SectionWrapper>
-
-        {/* HOW IT WORKS PROCESS */}
-        <SectionWrapper className="bg-[#F2F9FF] py-20 border-y border-[#BEE0FF] mb-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionHeading
-              badge="Hiring Process"
-              title="4 Simple Steps to"
-              highlightTitle="Join Our Team"
-              subtitle="From application to offer letter, our onboarding process is transparent and fast-paced."
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {STEPS.map((step, idx) => (
-                <GridStaggerItem key={step.num} index={idx}>
-                  <div className="bg-white p-6 rounded-2xl border border-[#BEE0FF] shadow-sm relative space-y-3">
-                    <div className="w-10 h-10 rounded-full bg-[#9FCFFB] text-[#0B1220] font-mono font-bold flex items-center justify-center text-sm">
-                      0{step.num}
-                    </div>
-                    <h3 className="text-base font-bold text-[#0B1220]">{step.title}</h3>
-                    <p className="text-xs text-[#334155] leading-relaxed">{step.desc}</p>
-                  </div>
-                </GridStaggerItem>
-              ))}
-            </div>
-          </div>
-        </SectionWrapper>
-
-        {/* ENQUIRY / APPLICATION FORM */}
-        <SectionWrapper id="apply-form" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="luxury-card p-8 sm:p-12 rounded-3xl border border-[#BEE0FF] shadow-xl">
-            <div className="text-center mb-8 space-y-2">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#D6EBFF] text-[#0B1220]">
-                <Sparkles className="w-3.5 h-3.5 text-[#0284c7]" />
-                <span>Internship Application Form</span>
-              </div>
-              <h2 className="text-3xl font-serif font-bold text-[#0B1220]">
-                Apply for Your Internship Track
-              </h2>
-              <p className="text-sm text-[#334155]">
-                Complete your details below to send an instant pre-filled application directly to our WhatsApp recruitment desk.
-              </p>
-            </div>
-
-            <form onSubmit={handleApply} className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs font-semibold text-[#0B1220] mb-1.5">
-                    Full Name <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g. Ananya Sundaram"
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-sm focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-[#0B1220] mb-1.5">
-                    Email Address <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="ananya@gmail.com"
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-sm focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs font-semibold text-[#0B1220] mb-1.5">
-                    Phone / WhatsApp Number <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="+91 98765 43210"
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-sm focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-[#0B1220] mb-1.5">
-                    Current Degree / Education
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.education}
-                    onChange={(e) => setFormData({ ...formData, education: e.target.value })}
-                    placeholder="e.g. B.E Computer Science / B.Tech IT"
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-sm focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs font-semibold text-[#0B1220] mb-1.5">
-                    College / University Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.college}
-                    onChange={(e) => setFormData({ ...formData, college: e.target.value })}
-                    placeholder="e.g. Anna University, Guindy"
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-sm focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-[#0B1220] mb-1.5">
-                    Year of Study / Graduation Year
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.year}
-                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                    placeholder="e.g. 3rd Year (Passing 2026)"
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-sm focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs font-semibold text-[#0B1220] mb-1.5">
-                    Interested Course <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    value={formData.course}
-                    onChange={(e) => setFormData({ ...formData, course: e.target.value, domain: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-sm focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
-                  >
-                    {COURSE_OPTIONS.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-[#0B1220] mb-1.5">
-                    Preferred Internship Domain
-                  </label>
-                  <select
-                    value={formData.domain}
-                    onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-sm focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
-                  >
-                    {DOMAINS.map((d) => (
-                      <option key={d.name} value={d.name}>{d.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs font-semibold text-[#0B1220] mb-1.5">
-                    Duration Preference
-                  </label>
-                  <select
-                    value={formData.duration}
-                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-sm focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
-                  >
-                    <option value="1–2 months">1–2 months</option>
-                    <option value="3–4 months">3–4 months</option>
-                    <option value="5–6 months">5–6 months</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-[#0B1220] mb-1.5">
-                    Work Mode Preference
-                  </label>
-                  <select
-                    value={formData.mode}
-                    onChange={(e) => setFormData({ ...formData, mode: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-sm focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
-                  >
-                    <option value="Remote">Remote</option>
-                    <option value="Hybrid">Hybrid</option>
-                    <option value="On-site (Guindy, Chennai)">On-site (Guindy, Chennai)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#0B1220] mb-1.5">
-                  Message / Why do you want to intern at SparkIntellect?
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Share a brief note about your interest, GitHub profile link, or key skills..."
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-sm focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={redirecting}
-                className="w-full py-4 rounded-xl font-bold text-sm bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-lg shadow-[#9FCFFB]/30 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
-              >
-                {redirecting ? (
-                  <span>Formatting & Redirecting to WhatsApp...</span>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>Submit & Apply via WhatsApp (+91 8977177634)</span>
-                  </>
-                )}
-              </button>
-
-              <p className="text-center text-xs text-[#334155]">
-                Clicking apply will open WhatsApp with your pre-filled application for instant processing.
-              </p>
-            </form>
           </div>
         </SectionWrapper>
 

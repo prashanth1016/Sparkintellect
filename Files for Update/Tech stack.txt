@@ -1,0 +1,1295 @@
+For the requirements you've described, this would be my recommended production technology stack for the complete SparkIntellect platform.
+
+SparkIntellect — Recommended Production Stack
+                         SPARKINTELLECT
+                              │
+             ┌────────────────┴────────────────┐
+             │                                 │
+       PUBLIC WEBSITE                     ADMIN PORTAL
+        Next.js                           Next.js
+        Netlify                           Netlify
+             │                                 │
+             └────────────────┬────────────────┘
+                              │
+                         HTTPS / REST
+                              │
+                              ▼
+                        NODE.JS BACKEND
+                           Render
+                              │
+             ┌────────────────┼─────────────────┐
+             │                │                 │
+             ▼                ▼                 ▼
+        MongoDB Atlas      Email API       Google APIs
+             │                                  │
+             │                                  ▼
+             │                            Google Sheets
+             │
+             ├── Users
+             ├── Employees
+             ├── Permissions
+             ├── Internships
+             ├── Applications
+             ├── Contacts
+             ├── Careers
+             ├── Case Studies
+             ├── FAQs
+             └── Audit Logs
+1. Frontend — Next.js
+Technology
+
+Next.js + React + TypeScript
+
+Your existing Next.js application should remain the foundation.
+
+I recommend:
+
+Next.js
+React
+TypeScript
+Why TypeScript?
+
+Because your website is becoming significantly more complex.
+
+You'll have:
+
+Internship objects
+Application objects
+Employee objects
+Permissions
+API responses
+CMS content
+Form schemas
+
+TypeScript will prevent many frontend/backend integration errors.
+
+2. Styling
+
+I recommend:
+
+Tailwind CSS
+
+Use:
+
+Next.js
++
+Tailwind CSS
+
+Then build a reusable design system.
+
+For example:
+
+Button
+Input
+Select
+Modal
+Card
+Badge
+Tabs
+Accordion
+Form
+Table
+Toast
+Dialog
+
+This is particularly useful because the public website and admin dashboard need consistent UI components.
+
+If your current website already uses another styling system, don't rewrite it unnecessarily. Keep it if it's working well.
+
+3. UI component library
+
+For the admin panel, I'd recommend:
+
+shadcn/ui
+
+It works very well with:
+
+Next.js
+TypeScript
+Tailwind
+
+You can build:
+
+Data tables
+Dialogs
+Dropdowns
+Forms
+Tabs
+Command menus
+Toast notifications
+Date pickers
+Sidebars
+Cards
+
+This will make the admin panel much faster to develop while still allowing complete customization.
+
+4. Animation
+
+For the public website:
+
+Framer Motion / Motion
+
+Use it selectively for:
+
+Hero animations
+Page transitions
+Scroll reveals
+Card interactions
+Micro-interactions
+
+Don't use heavy animation everywhere.
+
+Your new design should feel:
+
+premium and intelligent
+
+rather than:
+
+over-animated technology demo
+
+5. Icons
+
+Use:
+
+Lucide Icons
+
+This gives you a consistent icon system for:
+
+Services
+Admin
+Forms
+Applications
+Employees
+Settings
+Status indicators
+6. Frontend forms
+
+For your contact and internship application forms:
+
+React Hook Form
+
+Combined with:
+
+Zod
+
+Architecture:
+
+React Hook Form
+       ↓
+      Zod
+       ↓
+Validation
+       ↓
+Backend API
+
+This gives you strong client-side validation.
+
+But remember:
+
+Frontend validation is not enough.
+
+The backend must validate again.
+
+7. Backend — Node.js
+
+Keep your existing:
+
+Node.js
+
+But I recommend:
+
+Node.js + TypeScript
+
+rather than plain JavaScript.
+
+8. Backend framework
+
+You have two good choices:
+
+Option A — NestJS
+
+My recommendation if you're building the complete system.
+
+Node.js
+   ↓
+NestJS
+   ↓
+REST API
+
+NestJS gives you:
+
+Modules
+Controllers
+Services
+Guards
+Middleware
+Validation
+Dependency injection
+Authentication architecture
+Authorization architecture
+
+This is useful because your backend will become fairly large.
+
+Option B — Express/Fastify
+
+If your current backend already uses Express and is well structured, you don't necessarily need to migrate.
+
+So:
+
+Existing stable Express backend → keep it.
+
+New backend from scratch → NestJS is worth considering.
+
+9. API architecture
+
+Use:
+
+REST API
+
+For example:
+
+/api/v1/auth
+/api/v1/public
+/api/v1/admin
+
+Example:
+
+GET    /api/v1/public/internships
+GET    /api/v1/public/internships/:slug
+
+POST   /api/v1/public/internships/:id/apply
+POST   /api/v1/public/contact
+
+GET    /api/v1/admin/internships
+POST   /api/v1/admin/internships
+PATCH  /api/v1/admin/internships/:id
+
+GET    /api/v1/admin/applications
+PATCH  /api/v1/admin/applications/:id
+
+GET    /api/v1/admin/employees
+POST   /api/v1/admin/employees
+PATCH  /api/v1/admin/employees/:id
+
+Using /api/v1 makes future API versioning easier.
+
+10. Database — MongoDB
+
+Keep:
+
+MongoDB
+
+For production, use:
+
+MongoDB Atlas
+
+rather than maintaining your own MongoDB server.
+
+Architecture:
+
+Render
+  │
+  │ Secure connection
+  ↓
+MongoDB Atlas
+11. MongoDB ODM
+
+Use:
+
+Mongoose
+
+This gives you:
+
+Schemas
+Validation
+Models
+Relationships/references
+Indexes
+Middleware
+Query helpers
+
+For your application, I'd recommend carefully designed Mongoose schemas.
+
+12. Main MongoDB collections
+
+You'll likely need:
+
+users
+roles
+permissions
+
+internships
+applications
+applicationFields
+
+contacts
+
+careers
+careerApplications
+
+services
+industries
+caseStudies
+faqs
+announcements
+
+websiteSettings
+
+auditLogs
+
+You don't necessarily need every collection on day one.
+
+13. Authentication
+
+For the admin system, use secure authentication.
+
+I recommend:
+
+Session-based authentication
+
+with:
+
+HttpOnly + Secure cookies
+
+rather than storing authentication tokens in localStorage.
+
+Flow:
+
+Admin Login
+     ↓
+Backend
+     ↓
+Verify password
+     ↓
+Create session
+     ↓
+HttpOnly cookie
+     ↓
+Admin browser
+14. Password hashing
+
+Use:
+
+Argon2id
+
+for password hashing.
+
+Alternative:
+
+bcrypt
+
+Argon2id would be my first choice for a new system.
+
+Never store:
+
+plain-text passwords
+15. RBAC / permissions
+
+Your requirement makes this a core component.
+
+Use:
+
+RBAC + granular permissions
+
+Example:
+
+internship.read
+internship.create
+internship.update
+internship.publish
+internship.archive
+
+application.read
+application.update
+application.export
+
+contact.read
+contact.update
+
+employee.read
+employee.create
+employee.update
+employee.delete
+
+content.read
+content.create
+content.update
+content.delete
+
+Backend authorization middleware/guards checks these permissions.
+
+16. CEO access
+
+CEO should be a special protected role.
+
+CEO
+ ↓
+Full permissions
+
+But I'd still implement the permissions system rather than simply:
+
+throughout the code.
+
+That keeps the system maintainable.
+
+17. Employee invitation
+
+When CEO creates an employee:
+
+CEO
+ ↓
+Create Employee
+ ↓
+Backend
+ ↓
+MongoDB
+ ↓
+Invitation token
+ ↓
+Email
+ ↓
+Employee
+ ↓
+Set password
+ ↓
+Activate account
+
+Don't send passwords through email.
+
+18. Email system
+
+You need transactional email.
+
+My recommendation:
+
+Resend
+
+Use it for:
+
+Contact enquiries
+
+Internship application notifications
+
+Candidate confirmation
+
+Employee invitations
+
+Password reset
+
+Important admin notifications
+
+Architecture:
+
+Backend
+   ↓
+Resend API
+   ↓
+Email
+
+If you already use another provider successfully, you can keep it.
+
+19. Google Sheets integration
+
+Use:
+
+Google Sheets API
+
+The backend communicates with Google.
+
+Node.js Backend
+       ↓
+Google APIs
+       ↓
+Google Sheets
+
+Never put Google service credentials in the Next.js frontend.
+
+20. Google authentication
+
+For server-to-server Google Sheets integration, use:
+
+Google Service Account
+
+The relevant Google Sheet can be shared with the service account.
+
+Then:
+
+Internship
+    ↓
+Google Sheet ID
+    ↓
+MongoDB
+
+When an application arrives:
+
+Application
+ ↓
+Find internship
+ ↓
+Find Google Sheet ID
+ ↓
+Google Sheets API
+ ↓
+Append row
+21. File uploads
+
+Internship applications need resumes.
+
+I would not store large resume files directly inside MongoDB.
+
+Use object/file storage.
+
+You have several choices.
+
+Option A — Cloudinary
+
+Good if you also manage lots of images.
+
+Option B — AWS S3
+
+Very scalable.
+
+Option C — Cloudflare R2
+
+Often attractive for storage costs.
+
+Option D — Google Drive
+
+Since you're already using Google Sheets, this can simplify early implementation.
+
+For your current scale:
+
+Google Drive or S3-compatible storage would be reasonable.
+
+22. File security
+
+The backend should validate:
+
+File type
+File extension
+MIME type
+File size
+Filename
+
+For resumes, start with:
+
+PDF
+DOC
+DOCX
+
+Don't blindly trust the browser's MIME type.
+
+23. CAPTCHA / spam protection
+
+Your public API will eventually get attacked by bots.
+
+Use:
+
+Cloudflare Turnstile
+
+for:
+
+Contact
+Internship applications
+
+Architecture:
+
+User
+ ↓
+Form
+ ↓
+Turnstile
+ ↓
+Backend verification
+ ↓
+Accept / Reject
+24. Rate limiting
+
+Backend should have:
+
+Rate limiting
+
+For example:
+
+POST /contact
+POST /apply
+POST /login
+
+must be rate limited.
+
+Use something like:
+
+Redis
+
+if you need distributed rate limiting/session-related infrastructure.
+
+However, don't introduce Redis on day one unless there's a real requirement. You can start with an appropriate backend rate limiter and add Redis when scaling requires it.
+
+25. Admin dashboard
+
+Build with:
+
+Next.js
+TypeScript
+Tailwind
+shadcn/ui
+React Hook Form
+Zod
+TanStack Query
+TanStack Query
+
+This is particularly useful for:
+
+API fetching
+Caching
+Refetching
+Mutations
+Loading states
+Error states
+26. Admin data tables
+
+Use:
+
+TanStack Table
+
+for:
+
+Applications
+Employees
+Internships
+Contact leads
+Audit logs
+
+Then you can have:
+
+Search
+Sorting
+Filtering
+Pagination
+Column visibility
+Bulk actions
+27. State management
+
+Don't automatically add Redux.
+
+For this application:
+
+Server state
+
+TanStack Query
+
+Local UI state
+
+React state / Context
+
+That's enough initially.
+
+Add Zustand or Redux only if the application genuinely needs complex client state.
+
+28. Rich text editing
+
+Your admin panel will eventually need editors for:
+
+Internship description
+Service description
+Case studies
+FAQs
+
+Use a controlled rich text editor such as:
+
+Tiptap
+
+Then store the content in a well-defined format, ideally JSON or sanitized HTML depending on your rendering strategy.
+
+29. Image management
+
+For:
+
+Case studies
+Team
+Services
+Homepage
+Blog
+Internship images
+
+use an image storage/CDN solution.
+
+Possible:
+
+Cloudinary
+
+or
+
+S3 + CloudFront
+
+or another object-storage/CDN setup.
+
+30. Search
+
+You don't need Elasticsearch.
+
+MongoDB can handle your initial search requirements.
+
+For example:
+
+Search applications
+Search internships
+Search contacts
+
+Use MongoDB indexes and appropriate text/search functionality.
+
+If the platform becomes very large, you can introduce a dedicated search engine later.
+
+31. Logging
+
+Production backend needs structured logs.
+
+Use:
+
+Pino
+
+for Node.js.
+
+Log things such as:
+
+Request ID
+User ID
+Endpoint
+Response status
+Execution time
+Error
+
+Don't log sensitive information such as passwords or resume contents.
+
+32. Error monitoring
+
+I'd add:
+
+Sentry
+
+for:
+
+Frontend errors
+Backend errors
+API failures
+Performance issues
+
+This will be very useful when your public website starts receiving real traffic.
+
+33. API documentation
+
+Use:
+
+OpenAPI / Swagger
+
+Especially for your backend.
+
+Then your developers can see:
+
+/api/v1/internships
+/api/v1/applications
+/api/v1/auth
+
+with request/response definitions.
+
+34. Testing stack
+
+You should not launch this system without testing the important workflows.
+
+Backend
+
+Jest
+
+or the test framework supported by your backend framework.
+
+API
+
+Supertest
+
+Frontend
+
+Vitest
+
+End-to-end
+
+Playwright
+
+I'd particularly test:
+
+CEO login
+Employee login
+Permission denial
+Create internship
+Edit internship
+Publish internship
+Apply
+Resume upload
+Google Sheet submission
+Contact submission
+Email notification
+Employee creation
+Employee deactivation
+35. CI/CD
+
+Your source code can remain on:
+
+GitHub
+
+Then:
+
+GitHub
+  │
+  ├──────────────→ Netlify
+  │                  ↓
+  │             Next.js website
+  │
+  └──────────────→ Render
+                     ↓
+                  Node.js API
+
+Deployments happen automatically after approved changes.
+
+36. Hosting
+
+Your proposed hosting is perfectly reasonable.
+
+Public frontend
+
+Netlify
+
+Admin frontend
+
+Netlify
+
+Backend
+
+Render
+
+Database
+
+MongoDB Atlas
+
+File storage
+
+Google Drive / S3 / R2
+
+Email
+
+Resend
+
+DNS
+
+Your domain provider / DNS provider.
+
+37. Recommended domain structure
+
+I'd use:
+
+sparkintellect.in
+
+Public website.
+
+admin.sparkintellect.in
+
+Admin portal.
+
+api.sparkintellect.in
+
+Backend API.
+
+This is cleaner than putting the admin dashboard inside the public site's route structure.
+
+38. DNS
+
+Conceptually:
+
+sparkintellect.in
+       ↓
+Netlify
+
+admin.sparkintellect.in
+       ↓
+Netlify
+
+api.sparkintellect.in
+       ↓
+Render
+
+All communication should use HTTPS.
+
+39. CORS
+
+Your backend should only allow trusted origins.
+
+For example:
+
+https://sparkintellect.in
+https://www.sparkintellect.in
+https://admin.sparkintellect.in
+
+Don't use:
+
+Access-Control-Allow-Origin: *
+
+for your authenticated production API.
+
+40. Environment variables
+
+Backend secrets:
+
+MONGODB_URI
+JWT_SECRET / SESSION_SECRET
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+GOOGLE_SERVICE_ACCOUNT
+RESEND_API_KEY
+STORAGE_ACCESS_KEY
+STORAGE_SECRET
+TURNSTILE_SECRET
+
+Frontend:
+
+NEXT_PUBLIC_API_URL
+NEXT_PUBLIC_TURNSTILE_SITE_KEY
+
+Never put secret keys behind NEXT_PUBLIC_.
+
+41. CMS architecture
+
+Your database becomes:
+
+MongoDB
+│
+├── Internships
+├── Services
+├── Industries
+├── Case Studies
+├── FAQs
+├── Careers
+└── Website Settings
+
+Admin:
+
+Admin Panel
+     ↓
+Backend
+     ↓
+MongoDB
+
+Website:
+
+Public Website
+     ↓
+Backend
+     ↓
+MongoDB
+42. Internship CMS technology stack
+
+Specifically:
+
+Next.js Admin
+      ↓
+React Hook Form
+      ↓
+Zod
+      ↓
+REST API
+      ↓
+Node.js
+      ↓
+Mongoose
+      ↓
+MongoDB
+
+Then:
+
+MongoDB
+   ↓
+Google Sheets API
+   ↓
+Google Sheet
+43. Dynamic application forms
+
+This is one of the more technically interesting parts.
+
+MongoDB stores something like:
+
+Internship
+ └── applicationFields
+      ├── name
+      ├── email
+      ├── phone
+      ├── college
+      ├── resume
+      ├── github
+      └── linkedin
+
+Next.js retrieves those fields.
+
+Then React dynamically renders:
+
+Text input
+Email input
+Phone input
+Select
+File upload
+Textarea
+
+Therefore the form isn't hardcoded.
+
+44. Application submission architecture
+Next.js
+   ↓
+React Hook Form
+   ↓
+Zod
+   ↓
+Turnstile
+   ↓
+POST API
+   ↓
+Node.js
+   ↓
+Validate
+   ↓
+MongoDB
+   ↓
+File Storage
+   ↓
+Google Sheets
+   ↓
+Resend
+
+That's your complete application pipeline.
+
+45. Contact submission architecture
+Next.js
+   ↓
+React Hook Form
+   ↓
+Zod
+   ↓
+Turnstile
+   ↓
+Node.js
+   ↓
+MongoDB
+   ↓
+Resend
+   ↓
+Company Email
+46. Admin authentication architecture
+Admin
+ ↓
+Next.js
+ ↓
+POST /auth/login
+ ↓
+Node.js
+ ↓
+MongoDB
+ ↓
+Argon2
+ ↓
+Session
+ ↓
+HttpOnly Cookie
+ ↓
+Admin Dashboard
+
+Then every protected API:
+
+Request
+ ↓
+Session
+ ↓
+Authentication
+ ↓
+Authorization
+ ↓
+Permission
+ ↓
+Controller
+ ↓
+Service
+ ↓
+MongoDB
+47. Technology stack — final list
+
+Here's the stack I'd actually put into your project specification:
+
+Frontend
+Next.js
+React
+TypeScript
+Tailwind CSS
+shadcn/ui
+Motion / Framer Motion
+Lucide
+React Hook Form
+Zod
+TanStack Query
+TanStack Table
+Admin
+Next.js
+TypeScript
+Tailwind
+shadcn/ui
+React Hook Form
+Zod
+TanStack Query
+TanStack Table
+Tiptap
+Backend
+Node.js
+TypeScript
+NestJS (recommended for new backend)
+
+or keep your existing:
+
+Express/Fastify if your current backend is already stable.
+Database
+MongoDB Atlas
+Mongoose
+Authentication
+Secure cookie-based sessions
+Argon2id
+RBAC
+Granular permissions
+MFA for CEO ideally
+Integrations
+Google Sheets API
+Google Drive API if using Drive for resumes
+Resend API
+Cloudflare Turnstile
+Storage
+
+Choose one:
+
+Google Drive
+AWS S3
+Cloudflare R2
+Infrastructure
+Netlify — frontend
+Netlify — admin
+Render — backend
+MongoDB Atlas — database
+GitHub — source control
+Monitoring
+Sentry
+Pino
+API
+REST
+OpenAPI / Swagger
+Testing
+Vitest/Jest
+Supertest
+Playwright
+48. Don't add unnecessary technologies
+
+There is one thing I'd emphasize.
+
+You don't need to build this with 30 different services just because they're available.
+
+For version 1, the actual stack can be:
+
+NEXT.JS
+   │
+   ├── React
+   ├── TypeScript
+   ├── Tailwind
+   └── shadcn/ui
+          │
+          ↓
+       REST API
+          │
+          ↓
+       NODE.JS
+          │
+       NestJS
+          │
+          ↓
+       MONGOOSE
+          │
+          ↓
+    MONGODB ATLAS
+          │
+          ├── Google Sheets API
+          ├── Resend
+          └── File Storage
+
+That's enough to build your entire first production version.
+
+49. What I would use specifically for SparkIntellect
+
+If I were making the technical decisions today, my choices would be:
+
+Area	Choice
+Public frontend	Next.js + TypeScript
+Admin frontend	Next.js + TypeScript
+Styling	Tailwind CSS
+UI	shadcn/ui
+Animation	Motion
+Forms	React Hook Form + Zod
+Data fetching	TanStack Query
+Backend	Node.js + NestJS
+API	REST + OpenAPI
+Database	MongoDB Atlas
+ODM	Mongoose
+Auth	Secure HttpOnly session
+Password	Argon2id
+Permissions	RBAC + granular permissions
+Email	Resend
+Sheets	Google Sheets API
+Resume	Google Drive initially
+CAPTCHA	Cloudflare Turnstile
+Logs	Pino
+Error monitoring	Sentry
+Testing	Playwright + Jest/Vitest
+Source control	GitHub
+Frontend hosting	Netlify
+Backend hosting	Render
+Database hosting	MongoDB Atlas
+50. One final architectural recommendation
+
+Since you already have a Next.js frontend + Node.js backend + MongoDB, don't let an AI coding agent decide to replace your stack with something completely different.
+
+Your project brief should explicitly say:
+
+Preserve the existing Next.js frontend architecture wherever practical. Preserve the existing Node.js + MongoDB ecosystem. Refactor only where necessary. Do not migrate to PostgreSQL, Firebase, Supabase or another backend/database unless explicitly approved.
+
+Then tell it to audit the current code before modifying anything.
+
+That's particularly important because you also want to remove the existing Render service. The agent needs to determine whether that service is actually used by the current website or another application before removing it.
+
+The ideal end state is therefore:
+
+                  SPARKINTELLECT
+                        │
+        ┌───────────────┴────────────────┐
+        ↓                                ↓
+ sparkintellect.in              admin.sparkintellect.in
+    Next.js                         Next.js
+   Netlify                          Netlify
+        │                                │
+        └──────────────┬─────────────────┘
+                       ↓
+              api.sparkintellect.in
+                  Node.js/NestJS
+                     Render
+                       │
+                       ↓
+                 MongoDB Atlas
+                       │
+       ┌───────────────┼────────────────┐
+       ↓               ↓                ↓
+ Applications      Contacts       CMS Content
+       │
+       ├────────→ Google Sheets
+       │
+       └────────→ Resume Storage
+
+Backend integrations:
+Google Sheets + Resend + Turnstile + Storage
+
+That stack is more than capable of handling the website redesign, dynamic internship CMS, configurable application forms, Google Sheets per internship, contact email system, careers portal, CEO-controlled employee management, RBAC, audit logs and future CMS expansion you're planning.

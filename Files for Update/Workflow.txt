@@ -1,0 +1,1457 @@
+The cleanest way to understand the new SparkIntellect system is to treat it as 4 connected layers, each with a different responsibility:
+
+┌──────────────────────────────────────────────────────────┐
+│                    SPARKINTELLECT                        │
+│                                                          │
+│  1. FRONTEND     2. BACKEND     3. DATABASE     4. ADMIN│
+│                                                          │
+│  Netlify         Render         MongoDB Atlas   Admin UI │
+└──────────────────────────────────────────────────────────┘
+
+The most important rule is:
+
+Frontend never talks directly to MongoDB. Admin never directly modifies the database. Everything goes through the Backend API.
+
+1. Complete architecture
+
+Your production architecture should look like this:
+
+                         INTERNET
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │   PUBLIC FRONTEND   │
+                 │ sparkintellect.in   │
+                 │      Netlify        │
+                 └──────────┬──────────┘
+                            │
+                       HTTPS / API
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │     BACKEND API     │
+                 │ api.sparkintellect  │
+                 │       Render        │
+                 └──────────┬──────────┘
+                            │
+             ┌──────────────┼──────────────┐
+             │              │              │
+             ▼              ▼              ▼
+      MongoDB Atlas      Email Service   Google APIs
+             │                             │
+             │                             ▼
+             │                       Google Sheets
+             │
+             ▼
+       Application Data
+       User Data
+       Internship Data
+       Contact Data
+       CMS Data
+       Audit Logs
+
+And separately:
+
+                    ADMIN USER
+                        │
+                        ▼
+              ┌───────────────────┐
+              │    ADMIN PANEL     │
+              │ admin.spark...     │
+              │      Netlify       │
+              └─────────┬─────────┘
+                        │
+                   HTTPS / API
+                        │
+                        ▼
+                 ┌──────────────┐
+                 │ BACKEND API  │
+                 └──────┬───────┘
+                        │
+                        ▼
+                  MongoDB Atlas
+2. What each layer does
+
+This separation is extremely important.
+
+Frontend
+
+The frontend is responsible for:
+
+Displaying the website
+Showing internships
+Showing services
+Showing industries
+Displaying forms
+Collecting user input
+Sending API requests
+Showing success/error messages
+Responsive/mobile experience
+SEO/UI
+
+It should not:
+
+Store database credentials
+Decide whether an employee is authorized
+Directly modify MongoDB
+Contain Google API credentials
+Contain email provider secrets
+3. Backend
+
+The backend is the brain of the system.
+
+It handles:
+
+Authentication
+Authorization
+Permissions
+Business logic
+Validation
+MongoDB operations
+File uploads
+Email
+Google Sheets
+Admin operations
+Security
+Audit logs
+
+Everything important passes through here.
+
+4. MongoDB
+
+MongoDB is the permanent source of truth.
+
+It stores things like:
+
+Users
+Employees
+Permissions
+Internships
+Application forms
+Applications
+Contact enquiries
+Careers
+Case studies
+FAQs
+Website content
+Settings
+Audit logs
+
+Google Sheets is not your primary database.
+
+5. Admin Panel
+
+The admin panel is essentially a control center.
+
+The CEO or authorized employees use it to control:
+
+Internships
+Applications
+Careers
+Contact enquiries
+Website content
+Employees
+Permissions
+Settings
+
+But every action goes:
+
+Admin Panel
+     ↓
+Backend
+     ↓
+Permission Check
+     ↓
+MongoDB
+6. Public website workflow
+
+Let's start with the most basic operation.
+
+A visitor opens:
+
+sparkintellect.in
+
+The browser loads the frontend from Netlify.
+
+Browser
+   ↓
+Netlify
+   ↓
+React/Next.js frontend
+
+The frontend then needs dynamic information.
+
+For example:
+
+What internships are currently available?
+
+It calls:
+
+GET /api/public/internships
+
+Backend:
+
+Frontend
+   ↓
+GET /api/public/internships
+   ↓
+Backend
+   ↓
+MongoDB
+   ↓
+Return internships
+   ↓
+Frontend
+   ↓
+Display cards
+7. Homepage workflow
+
+Suppose your homepage has:
+
+Services
+Industries
+Case Studies
+Internship highlights
+FAQs
+
+Some of this can remain static.
+
+Dynamic information comes from the backend.
+
+For example:
+
+Homepage
+   │
+   ├── Static design
+   │
+   ├── Services → API
+   │
+   ├── Case Studies → API
+   │
+   ├── FAQs → API
+   │
+   └── Internship highlights → API
+
+The frontend doesn't know where the data is physically stored.
+
+It only knows:
+
+"Give me published internships."
+
+8. Internship workflow — complete
+
+This is probably the most important workflow.
+
+Step 1 — CEO creates internship
+
+CEO logs into:
+
+admin.sparkintellect.in
+
+Goes:
+
+Internships
+    ↓
+Create Internship
+
+Enters:
+
+Title
+Description
+Duration
+Mode
+Eligibility
+Skills
+Benefits
+
+Then configures the form.
+
+9. Admin creates application form
+
+CEO chooses:
+
+Application Form
+
+Adds:
+
+Full Name
+Email
+Phone
+College
+Degree
+Graduation Year
+Resume
+GitHub
+LinkedIn
+Portfolio
+Why do you want this internship?
+
+Each field has:
+
+Type
+Required
+Label
+Placeholder
+Options
+Order
+10. Publish internship
+
+CEO clicks:
+
+Publish
+
+Frontend sends:
+
+POST /api/admin/internships
+
+Backend:
+
+Authenticate CEO
+       ↓
+Check permission
+       ↓
+Validate data
+       ↓
+Create internship
+       ↓
+Store in MongoDB
+       ↓
+Create/link Google Sheet
+       ↓
+Save Google Sheet ID
+       ↓
+Audit log
+11. Website automatically updates
+
+Now a visitor opens:
+
+sparkintellect.in/internships
+
+Frontend:
+
+GET /api/public/internships
+
+Backend:
+
+MongoDB
+   ↓
+Find:
+published = true
+status = open
+
+Returns:
+
+AI Full Stack
+AI/ML
+UI/UX
+
+The website displays them.
+
+No coding required.
+
+12. Student opens internship
+
+Student clicks:
+
+AI Full Stack Development
+
+Frontend requests:
+
+GET /api/public/internships/ai-full-stack-development
+
+Backend gets the document from MongoDB.
+
+The frontend renders:
+
+Title
+Description
+Duration
+Eligibility
+Skills
+Benefits
+Application Form
+13. Student submits application
+
+Student fills:
+
+Name
+Email
+Phone
+College
+Resume
+GitHub
+etc.
+
+Clicks:
+
+Submit Application
+
+Frontend sends:
+
+POST /api/public/internships/:id/apply
+14. Backend validates the application
+
+Backend checks:
+
+Is internship valid?
+       ↓
+Is it published?
+       ↓
+Is it still open?
+       ↓
+Are required fields present?
+       ↓
+Is email valid?
+       ↓
+Is file valid?
+       ↓
+Is request suspicious/spam?
+
+If something fails:
+
+Backend
+   ↓
+400 / 422
+   ↓
+Frontend
+   ↓
+"Please correct these fields"
+15. Application gets stored
+
+If everything is valid:
+
+Application
+     ↓
+MongoDB
+
+Example:
+
+Application ID
+Internship ID
+Candidate details
+Answers
+Resume reference
+Status = New
+Timestamp
+
+This is your permanent record.
+
+16. Resume upload
+
+Resume should go to secure storage.
+
+Workflow:
+
+Resume
+   ↓
+Backend
+   ↓
+Validate file
+   ↓
+Secure file storage
+   ↓
+Get file URL/reference
+   ↓
+MongoDB
+
+MongoDB stores the reference, not necessarily the entire PDF.
+
+17. Google Sheet workflow
+
+Now backend finds:
+
+internship.googleSheet.spreadsheetId
+
+Then:
+
+Backend
+   ↓
+Google Sheets API
+   ↓
+Append application row
+
+Example:
+
+Date	Name	Email	College	Phone	Resume
+31 Aug	Arun	...	ABC	...	Link
+
+The correct internship sheet is automatically selected.
+
+18. Email workflow
+
+After application:
+
+Backend
+   │
+   ├── MongoDB ✓
+   │
+   ├── Google Sheet ✓
+   │
+   └── Email Service
+           ↓
+       Company email
+
+You receive:
+
+New application received for AI Full Stack Development.
+
+Optionally:
+
+Backend
+   ↓
+Candidate email
+
+Your application has been successfully received.
+
+19. What if Google Sheets fails?
+
+This is an important production consideration.
+
+Don't make the application depend entirely on Google Sheets.
+
+Correct workflow:
+
+Candidate
+   ↓
+MongoDB
+   ↓
+Application successfully saved
+   ↓
+Try Google Sheets
+   ↓
+FAILED
+   ↓
+Mark sync = pending
+
+Then retry later.
+
+Example:
+
+googleSheetSync:
+{
+   status: "pending",
+   attempts: 2
+}
+
+So you never lose an application because Google had a temporary API problem.
+
+20. Admin sees the application
+
+CEO opens:
+
+Admin
+ ↓
+Applications
+
+Backend:
+
+GET /api/admin/applications
+
+Backend checks:
+
+Authenticated?
+       ↓
+Application.read permission?
+       ↓
+YES
+
+Then MongoDB returns applications.
+
+21. Application status
+
+Admin can change:
+
+NEW
+ ↓
+REVIEWING
+ ↓
+SHORTLISTED
+ ↓
+INTERVIEW
+ ↓
+SELECTED
+
+or:
+
+REJECTED
+
+Example:
+
+Candidate: Arun
+Internship: AI Full Stack
+Status: Interview
+
+This status is stored in MongoDB.
+
+22. Closing an internship
+
+CEO:
+
+Internships
+ ↓
+AI Full Stack
+ ↓
+Close
+
+Backend:
+
+status = closed
+
+Website:
+
+AI Full Stack Development
+
+Applications Closed
+
+The form automatically stops accepting applications.
+
+23. Archiving
+
+Later:
+
+Open
+ ↓
+Closed
+ ↓
+Archived
+
+Archived internships aren't displayed in active listings.
+
+But:
+
+Applications remain in MongoDB.
+
+This is important.
+
+24. Contact workflow
+
+Now the contact page.
+
+Visitor fills:
+
+Name
+Email
+Phone
+Company
+Service
+Budget
+Timeline
+Project details
+
+Clicks:
+
+Send Enquiry
+
+Frontend:
+
+POST /api/public/contact
+
+Backend:
+
+Validate
+ ↓
+Spam protection
+ ↓
+MongoDB
+ ↓
+Email service
+25. Contact email
+
+Company receives:
+
+NEW WEBSITE ENQUIRY
+
+Name:
+Rahul Kumar
+
+Email:
+rahul@example.com
+
+Phone:
++91 XXXXX
+
+Company:
+ABC Technologies
+
+Service:
+AI Development
+
+Budget:
+₹5L–₹10L
+
+Timeline:
+1–3 months
+
+Project:
+...
+
+The contact submission is also stored in MongoDB.
+
+26. Admin contact workflow
+
+CEO:
+
+Admin
+ ↓
+Contact Leads
+
+Sees:
+
+New
+Contacted
+Qualified
+Closed
+
+Can open a lead and add notes.
+
+27. Employee workflow
+
+Now the important RBAC part.
+
+Employee logs in.
+
+Employee
+   ↓
+Admin Panel
+   ↓
+Login
+   ↓
+Backend authentication
+   ↓
+MongoDB
+   ↓
+User found
+   ↓
+Load permissions
+
+Suppose employee has:
+
+internship.read
+application.read
+
+The admin UI shows:
+
+Internships
+Applications
+
+But doesn't show employee management.
+
+28. Read-only employee
+
+Employee opens an internship.
+
+They can see:
+
+Title
+Description
+Applications
+
+But:
+
+Create
+Edit
+Delete
+
+are unavailable.
+
+However, the real security is backend-side.
+
+If they manually try:
+
+POST /api/admin/internships
+
+backend checks:
+
+Does user have internship.create?
+
+No.
+
+Response:
+
+403 Forbidden
+
+So even if they manipulate the browser, they cannot create an internship.
+
+29. Write employee
+
+Employee with:
+
+internship.read
+internship.create
+internship.update
+application.read
+
+can:
+
+Create internship
+Edit internship
+View applications
+
+but cannot:
+
+Create employees
+Delete employees
+Change permissions
+30. CEO workflow
+
+CEO has full permissions.
+
+CEO
+ ↓
+Admin
+
+Can:
+
+Manage employees
+Manage permissions
+Manage internships
+Manage applications
+Manage contact leads
+Manage CMS
+Manage settings
+View audit logs
+31. Employee creation workflow
+
+CEO:
+
+Employees
+ ↓
+Create Employee
+
+Enters:
+
+Name
+Email
+Role
+Permissions
+
+Example:
+
+Arun
+Internship Manager
+
+✓ internship.read
+✓ internship.create
+✓ internship.update
+✓ application.read
+
+✗ employee.create
+✗ employee.delete
+✗ permission.manage
+
+Backend stores this in MongoDB.
+
+Then sends an invitation email.
+
+32. Employee deletion
+
+Only CEO can do:
+
+DELETE /api/admin/employees/:id
+
+Backend:
+
+Is authenticated?
+      ↓
+Is CEO?
+      ↓
+YES
+      ↓
+Deactivate/delete
+      ↓
+Audit log
+
+I recommend deactivation instead of immediate deletion.
+
+For example:
+
+status = inactive
+
+That preserves historical records.
+
+33. Admin website CMS workflow
+
+This is where the website becomes truly dynamic.
+
+Suppose you want to change:
+
+"3 Month Internship"
+
+to:
+
+"6 Month Internship"
+
+CEO:
+
+Admin
+ ↓
+Internships
+ ↓
+Edit
+ ↓
+Duration = 6 Months
+ ↓
+Save
+
+Backend:
+
+PATCH /api/admin/internships/:id
+ ↓
+MongoDB
+
+Website next request:
+
+GET /api/public/internships/:slug
+
+gets:
+
+6 Months.
+
+No developer involvement.
+
+34. Homepage CMS
+
+You can eventually make parts of the homepage dynamic too.
+
+For example:
+
+Homepage
+├── Announcement
+├── Featured Services
+├── Featured Work
+├── Featured Internships
+├── FAQs
+└── CTA
+
+Admin changes:
+
+Featured Internship
+
+Website automatically updates.
+
+35. What should happen when a service changes?
+
+Example:
+
+CEO changes:
+
+AI Development description
+
+Admin:
+
+Website
+ ↓
+Services
+ ↓
+AI Development
+ ↓
+Edit
+
+Backend:
+
+MongoDB
+
+Public page:
+
+/services/ai-development
+
+gets the new content.
+
+36. Audit workflow
+
+Every important admin action:
+
+Admin action
+    ↓
+Backend
+    ↓
+MongoDB operation
+    ↓
+Audit log
+
+Example:
+
+31 Aug 2026 17:30
+
+User:
+CEO
+
+Action:
+INTERNSHIP_UPDATED
+
+Internship:
+AI Full Stack
+
+Changes:
+Duration:
+3 Months → 6 Months
+37. Authentication workflow
+
+Don't implement login as:
+
+Frontend
+ ↓
+"Is password correct?"
+
+Instead:
+
+Admin Login
+ ↓
+POST /api/auth/login
+ ↓
+Backend
+ ↓
+Find user
+ ↓
+Verify password hash
+ ↓
+Create secure session/token
+ ↓
+HttpOnly cookie
+ ↓
+Admin Panel
+
+Every protected API request:
+
+Cookie
+ ↓
+Backend
+ ↓
+Validate session
+ ↓
+Identify user
+ ↓
+Load permissions
+ ↓
+Authorize action
+38. Security model
+
+The security hierarchy should be:
+
+                  INTERNET
+                     │
+                     ↓
+                API Gateway
+                     │
+               Authentication
+                     │
+               Authorization
+                     │
+                Validation
+                     │
+                Business Logic
+                     │
+                     ↓
+                  MongoDB
+
+Never:
+
+Frontend → MongoDB
+
+Never put:
+
+MongoDB URI
+Google credentials
+Email API key
+JWT secret
+
+in the frontend.
+
+39. Database relationship concept
+
+Even though MongoDB is document-oriented, you still maintain references.
+
+For example:
+
+User
+ │
+ └── createdBy → Internship
+
+Internship
+ │
+ ├── applications
+ │
+ └── googleSheet
+
+Application
+ │
+ └── internshipId → Internship
+
+So:
+
+Internship
+   │
+   ├── ID
+   ├── Title
+   ├── Form
+   ├── Status
+   └── Google Sheet ID
+             │
+             ↓
+       Applications
+40. Complete internship lifecycle
+
+Here's the entire process in one diagram:
+
+CEO
+ │
+ │ Create
+ ↓
+Internship
+ │
+ ↓
+MongoDB
+ │
+ ↓
+Google Sheet Created/Linked
+ │
+ ↓
+Publish
+ │
+ ↓
+Public Website
+ │
+ ↓
+Student Views
+ │
+ ↓
+Student Applies
+ │
+ ↓
+Backend
+ │
+ ├──── Validate
+ │
+ ├──── Save MongoDB
+ │
+ ├──── Upload Resume
+ │
+ ├──── Google Sheet
+ │
+ └──── Email
+ │
+ ↓
+Admin Dashboard
+ │
+ ↓
+Review
+ │
+ ├── Reviewing
+ ├── Shortlisted
+ ├── Interview
+ ├── Selected
+ └── Rejected
+ │
+ ↓
+Close Internship
+ │
+ ↓
+Archive
+41. Complete contact lifecycle
+Visitor
+  ↓
+Contact Form
+  ↓
+Frontend validation
+  ↓
+Backend
+  ↓
+Spam protection
+  ↓
+MongoDB
+  ↓
+Email notification
+  ↓
+CEO / Team
+  ↓
+Admin dashboard
+  ↓
+New
+  ↓
+Contacted
+  ↓
+Qualified
+  ↓
+Closed
+42. Complete employee lifecycle
+CEO
+ ↓
+Create Employee
+ ↓
+Assign Permissions
+ ↓
+Employee Invitation
+ ↓
+Employee Login
+ ↓
+Backend Authentication
+ ↓
+Permission Check
+ ↓
+Admin Dashboard
+ ↓
+Allowed Operations
+ ↓
+Audit Log
+
+If CEO disables employee:
+
+CEO
+ ↓
+Disable
+ ↓
+User.status = inactive
+ ↓
+Employee cannot authenticate
+43. Complete website content lifecycle
+CEO / Authorized Employee
+             ↓
+        Admin Panel
+             ↓
+          Backend
+             ↓
+          MongoDB
+             ↓
+         Public API
+             ↓
+       Public Website
+             ↓
+           Visitor
+
+This is how you get:
+
+"Change it in admin → website automatically changes."
+
+44. What is static vs dynamic?
+
+This is important for your redesign.
+
+Keep static/code-controlled
+Logo
+Typography
+Colors
+Animations
+Page layouts
+Responsive design
+Navigation structure
+Core UI components
+Security
+Make dynamic/CMS-controlled
+Internships
+Internship details
+Application fields
+Application status
+Careers
+Case studies
+FAQs
+Announcements
+Contact information
+Featured content
+
+This gives you flexibility without making the admin panel unnecessarily complicated.
+
+45. Recommended API separation
+
+I'd divide the API into:
+
+/api/public/*
+
+For public website.
+
+/api/auth/*
+
+For authentication.
+
+/api/admin/*
+
+For administrative functions.
+
+For example:
+
+PUBLIC
+
+GET  /api/public/internships
+GET  /api/public/internships/:slug
+POST /api/public/internships/:id/apply
+POST /api/public/contact
+GET  /api/public/services
+GET  /api/public/case-studies
+
+Admin:
+
+GET    /api/admin/internships
+POST   /api/admin/internships
+PATCH  /api/admin/internships/:id
+DELETE /api/admin/internships/:id
+
+GET    /api/admin/applications
+PATCH  /api/admin/applications/:id
+
+GET    /api/admin/contacts
+
+GET    /api/admin/employees
+POST   /api/admin/employees
+PATCH  /api/admin/employees/:id
+46. What happens when the backend is down?
+
+Your public static pages can still potentially load if designed properly.
+
+But dynamic functionality won't work:
+
+Backend down
+    ↓
+Internship API unavailable
+    ↓
+Application unavailable
+    ↓
+Contact unavailable
+
+Therefore production needs:
+
+Monitoring
+Error logging
+Health checks
+Database backups
+Alerts
+Graceful frontend errors
+
+For example:
+
+"We're temporarily unable to load internship opportunities. Please try again shortly."
+
+rather than a broken page.
+
+47. What happens when MongoDB is down?
+
+Backend should fail gracefully.
+
+Frontend
+ ↓
+Backend
+ ↓
+MongoDB unavailable
+ ↓
+503
+ ↓
+Frontend friendly error
+
+You should also have:
+
+MongoDB Atlas backups
+Monitoring
+Proper indexes
+Connection pooling
+Retry logic where appropriate
+48. Final responsibility matrix
+Function	Frontend	Backend	MongoDB	Admin
+Display website	✅			
+Display internships	✅	✅	✅	
+Create internship		✅	✅	✅
+Edit internship		✅	✅	✅
+Publish internship		✅	✅	✅
+Application form	✅	✅		
+Submit application	✅	✅	✅	
+Google Sheet		✅		
+Email		✅		
+Contact form	✅	✅	✅	
+Employee creation		✅	✅	✅ CEO
+Permissions		✅	✅	✅ CEO
+Audit logs		✅	✅	View
+Website content	✅	✅	✅	✅
+49. The single most important workflow
+
+Everything ultimately follows this pattern:
+
+                  USER ACTION
+                      │
+                      ▼
+                  FRONTEND
+                      │
+                  HTTPS/API
+                      │
+                      ▼
+                  BACKEND
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+ Authentication   Permission    Validation
+        │             │             │
+        └─────────────┼─────────────┘
+                      │
+                      ▼
+                  BUSINESS
+                   LOGIC
+                      │
+                      ▼
+                  MONGODB
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+      Email      Google Sheets   File Storage
+        │             │             │
+        └─────────────┼─────────────┘
+                      │
+                      ▼
+                 API RESPONSE
+                      │
+                      ▼
+                  FRONTEND
+                      │
+                      ▼
+                  USER SEES
+
+And for an admin action:
+
+CEO / Employee
+      ↓
+Admin Panel
+      ↓
+Backend
+      ↓
+Authentication
+      ↓
+Permission Check
+      ↓
+Business Logic
+      ↓
+MongoDB
+      ↓
+Audit Log
+      ↓
+Response
+      ↓
+Admin Panel
+50. In your case, the ideal final system
+
+I'd therefore build SparkIntellect around four clear products:
+
+① Public Website
+sparkintellect.in
+
+Premium, simple, fast, SEO-friendly.
+
+② Admin Portal
+admin.sparkintellect.in
+
+CEO + employee controlled.
+
+③ Backend
+api.sparkintellect.in
+
+Node.js/TypeScript on Render.
+
+④ Database
+MongoDB Atlas
+
+Central source of truth.
+
+Then integrate:
+
+Google Sheets
+Email
+File Storage
+Analytics
+
+around the backend.
+
+The result is that the frontend becomes the presentation layer, the backend becomes the brain, MongoDB becomes the source of truth, and the admin panel becomes the control center. That separation will let you grow SparkIntellect's website without turning every content change into a coding/deployment task.

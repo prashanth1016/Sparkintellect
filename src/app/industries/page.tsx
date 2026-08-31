@@ -9,32 +9,30 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SectionWrapper, GridStaggerItem } from "@/components/ui/SectionWrapper";
 import { INDUSTRIES } from "@/data/companyData";
 import { 
-  ShoppingBag, 
-  Sparkles, 
-  Factory, 
-  GraduationCap, 
-  Activity, 
   Building, 
-  Utensils, 
-  Briefcase,
-  CheckCircle,
-  ArrowRight
+  Activity, 
+  GraduationCap, 
+  ShoppingBag, 
+  Factory, 
+  Briefcase, 
+  ArrowRight,
+  Sparkles,
+  CheckCircle2
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Industries Served | SparkIntellect AI Solutions",
-  description: "SparkIntellect builds specialized AI and software solutions for Retail, Fashion, Manufacturing, EdTech, Healthcare, Real Estate, Hospitality, and Professional Services.",
+  title: "Industries We Serve | SparkIntellect",
+  description:
+    "Explore how SparkIntellect engineers AI models, ERP software, and web applications tailored for Construction, Healthcare, Education, Retail, Manufacturing, and Finance.",
 };
 
 const INDUSTRY_ICONS: Record<string, React.ElementType> = {
-  ShoppingBag,
-  Sparkles,
-  Factory,
-  GraduationCap,
-  Activity,
-  Building,
-  Utensils,
-  Briefcase,
+  "construction": Building,
+  "healthcare": Activity,
+  "education": GraduationCap,
+  "retail": ShoppingBag,
+  "manufacturing": Factory,
+  "finance": Briefcase,
 };
 
 export default function IndustriesPage() {
@@ -47,57 +45,56 @@ export default function IndustriesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <SectionHeading
-            badge="Vertical Solutions"
-            title="Digital Transformation Across"
-            highlightTitle="8 Key Domains"
-            subtitle="Explore how SparkIntellect crafts industry-tailored platforms, automated workflows, and AI assistants designed for specific business operations."
+            badge="Vertical Expertise"
+            title="Industry-Tailored Software &"
+            highlightTitle="AI Solutions"
+            subtitle="We design systems addressing the specific regulatory, operational, and customer challenges of key business verticals."
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {INDUSTRIES.map((ind, idx) => {
-              const Icon = INDUSTRY_ICONS[ind.iconName] || Briefcase;
+              const Icon = INDUSTRY_ICONS[ind.slug] || Sparkles;
+
               return (
                 <GridStaggerItem key={ind.id} index={idx}>
-                  <div
-                    id={ind.id}
-                    className="luxury-card p-8 rounded-3xl border border-[#BEE0FF] bg-white scroll-mt-32 space-y-6 shadow-md hover:shadow-xl transition-all"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center shrink-0">
-                        <Icon className="w-7 h-7 text-[#0284c7]" />
+                  <div className="luxury-card luxury-card-hover p-8 rounded-3xl border border-[#BEE0FF] h-full flex flex-col justify-between bg-white">
+                    <div className="space-y-4">
+                      <div className="w-14 h-14 rounded-2xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center text-[#0284c7]">
+                        <Icon className="w-7 h-7" />
                       </div>
-                      <div>
-                        <h2 className="text-2xl font-serif font-bold text-[#0B1220]">{ind.name}</h2>
-                        <span className="text-xs font-mono text-[#0284c7]">Industry Track</span>
-                      </div>
-                    </div>
 
-                    <p className="text-[#334155] text-sm leading-relaxed">
-                      {ind.description}
-                    </p>
-
-                    <div className="space-y-3 pt-2 border-t border-[#BEE0FF]">
-                      <h3 className="text-xs font-mono text-[#0284c7] uppercase font-bold tracking-wider">
-                        Popular Industry Implementations:
+                      <h3 className="text-2xl font-serif font-bold text-[#0B1220]">
+                        {ind.name}
                       </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+
+                      <p className="text-xs font-semibold text-[#0284c7]">
+                        {ind.tagline}
+                      </p>
+
+                      <p className="text-xs text-[#334155] leading-relaxed">
+                        {ind.description}
+                      </p>
+
+                      <div className="space-y-2 pt-2 border-t border-[#BEE0FF]/60">
+                        <div className="text-[10px] font-mono font-bold uppercase text-[#334155]">
+                          Key Sector Solutions:
+                        </div>
                         {ind.useCases.map((uc, i) => (
-                          <div key={i} className="p-3 rounded-xl bg-[#F2F9FF] border border-[#BEE0FF] text-xs text-[#0B1220] flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <div key={i} className="flex items-center gap-2 text-xs text-[#0B1220]">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#0284c7] shrink-0" />
                             <span>{uc}</span>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="pt-4 flex items-center justify-between">
-                      <span className="text-xs text-[#334155]">Tailored Architecture</span>
+                    <div className="pt-6 mt-6 border-t border-[#BEE0FF]">
                       <Link
-                        href="/contact"
-                        className="px-5 py-2 rounded-full text-xs font-bold text-[#0B1220] bg-[#9FCFFB] hover:bg-[#8ec2f3] transition-colors flex items-center gap-1.5"
+                        href={`/industries/${ind.slug}`}
+                        className="text-xs font-bold text-[#0B1220] hover:text-[#0284c7] flex items-center gap-1.5 transition-colors group"
                       >
-                        <span>Discuss {ind.name}</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <span>Explore {ind.name} Deep Dive</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform text-[#0284c7]" />
                       </Link>
                     </div>
                   </div>

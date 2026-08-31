@@ -1,82 +1,82 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import { INDUSTRIES } from "@/data/companyData";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { SectionWrapper, GridStaggerItem } from "@/components/ui/SectionWrapper";
 import { 
-  ShoppingBag, 
-  Sparkles, 
-  Factory, 
-  GraduationCap, 
-  Activity, 
   Building, 
-  Utensils, 
+  Activity, 
+  GraduationCap, 
+  ShoppingBag, 
+  Factory, 
   Briefcase,
-  CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
+import { SectionWrapper, GridStaggerItem } from "@/components/ui/SectionWrapper";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { INDUSTRIES } from "@/data/companyData";
 
 const INDUSTRY_ICONS: Record<string, React.ElementType> = {
-  ShoppingBag,
-  Sparkles,
-  Factory,
-  GraduationCap,
-  Activity,
-  Building,
-  Utensils,
-  Briefcase,
+  "construction": Building,
+  "healthcare": Activity,
+  "education": GraduationCap,
+  "retail": ShoppingBag,
+  "manufacturing": Factory,
+  "finance": Briefcase,
 };
 
 export const IndustriesGrid: React.FC = () => {
   return (
-    <SectionWrapper className="relative z-10 py-24 border-t border-[#BEE0FF] bg-[#F2F9FF]">
+    <SectionWrapper id="industries" className="py-20 bg-[#F2F9FF] border-y border-[#BEE0FF]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         <SectionHeading
-          badge="Vertical Domain Expertise"
-          title="Transforming Diverse"
-          highlightTitle="Industries & Sectors"
-          subtitle="Whether you run a fast-paced retail chain, a modern manufacturing plant, a healthcare portal, or a fashion brand, we build specialized digital platforms."
+          badge="Domain Depth"
+          title="Industries We"
+          highlightTitle="Empower & Scale"
+          subtitle="We tailor our AI models, ERP systems, and cloud portals to the unique regulatory and operational needs of each sector."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {INDUSTRIES.map((industry, idx) => {
-            const Icon = INDUSTRY_ICONS[industry.iconName] || Briefcase;
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {INDUSTRIES.map((ind, idx) => {
+            const Icon = INDUSTRY_ICONS[ind.slug] || Sparkles;
+
             return (
-              <GridStaggerItem key={industry.id} index={idx}>
-                <div className="luxury-card luxury-card-hover p-6 rounded-2xl border border-[#BEE0FF] flex flex-col justify-between h-full bg-white">
+              <GridStaggerItem key={ind.id} index={idx}>
+                <div className="luxury-card luxury-card-hover p-8 rounded-3xl border border-[#BEE0FF] h-full flex flex-col justify-between bg-white">
                   <div>
-                    <div className="w-12 h-12 rounded-xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center mb-5 text-[#0B1220]">
-                      <Icon className="w-6 h-6 text-[#0284c7]" />
+                    <div className="w-12 h-12 rounded-2xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center mb-6 text-[#0284c7]">
+                      <Icon className="w-6 h-6" />
                     </div>
 
-                    <h3 className="text-lg font-serif font-bold text-[#0B1220] mb-2">
-                      {industry.name}
+                    <h3 className="text-xl font-serif font-bold text-[#0B1220] mb-2">
+                      {ind.name}
                     </h3>
 
-                    <p className="text-[#334155] text-xs leading-relaxed mb-4">
-                      {industry.description}
+                    <p className="text-xs text-[#0284c7] font-semibold mb-3">
+                      {ind.tagline}
                     </p>
 
-                    <div className="space-y-1.5 pt-2 border-t border-[#BEE0FF]">
-                      <span className="text-[11px] font-mono text-[#0284c7] uppercase font-bold tracking-wider block mb-1">
-                        Use Cases:
-                      </span>
-                      {industry.useCases.map((uc, i) => (
-                        <div key={i} className="flex items-center gap-1.5 text-xs text-[#0B1220]">
-                          <CheckCircle2 className="w-3 h-3 text-[#0284c7] shrink-0" />
-                          <span className="truncate">{uc}</span>
-                        </div>
+                    <p className="text-xs text-[#334155] leading-relaxed mb-4">
+                      {ind.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1.5 pt-2">
+                      {ind.useCases.slice(0, 3).map((uc, i) => (
+                        <span key={i} className="px-2.5 py-0.5 rounded-full bg-[#F2F9FF] border border-[#BEE0FF] text-[10px] font-mono text-[#0B1220]">
+                          {uc}
+                        </span>
                       ))}
                     </div>
                   </div>
 
-                  <div className="pt-5 mt-4">
+                  <div className="pt-6 mt-6 border-t border-[#BEE0FF]">
                     <Link
-                      href={`/industries#${industry.id}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0284c7] hover:underline"
+                      href={`/industries/${ind.slug}`}
+                      className="text-xs font-bold text-[#0B1220] hover:text-[#0284c7] flex items-center gap-1.5 transition-colors group"
                     >
-                      <span>Industry Solution Details</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <span>Explore {ind.name} Solutions</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform text-[#0284c7]" />
                     </Link>
                   </div>
                 </div>
@@ -84,6 +84,17 @@ export const IndustriesGrid: React.FC = () => {
             );
           })}
         </div>
+
+        <div className="text-center">
+          <Link
+            href="/industries"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-xs bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-md transition-all"
+          >
+            <span>View All Industry Case Studies</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
       </div>
     </SectionWrapper>
   );
