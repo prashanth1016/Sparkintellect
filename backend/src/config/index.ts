@@ -21,11 +21,14 @@ const envSchema = z.object({
   GOOGLE_SHEET_ID: z.string().optional(),
   GOOGLE_SHEET_TAB_NAME: z.string().default("Applications"),
   GOOGLE_DRIVE_RESUME_FOLDER_ID: z.string().optional(),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_REFRESH_TOKEN: z.string().optional(),
   UPLOAD_DIR: z.string().default(path.join(process.cwd(), "uploads")),
   MAX_FILE_SIZE_BYTES: z.string().default("5242880").transform((v) => parseInt(v, 10)),
   ALLOWED_ORIGINS: z
     .string()
-    .default("http://localhost:3000,http://localhost:3001,https://sparkintellect.in,https://admin.sparkintellect.in")
+    .default("http://localhost:3000,http://localhost:3001,https://sparkintellect.in,https://www.sparkintellect.in,https://admin.sparkintellect.in")
     .transform((val) => val.split(",").map((s) => s.trim())),
 });
 

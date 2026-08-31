@@ -79,12 +79,12 @@ export default function ContactPage() {
     try {
       const res = await publicApi.submitContact(formData);
       setSuccessInfo({
-        contactId: res.contactId || `INQ-${Date.now().toString().slice(-6)}`,
+        contactId: res.contactReferenceId || res.contactId || `SI-INQ-${new Date().getFullYear()}-0001`,
         message: res.message || "Your inquiry has been received by our engineering team.",
       });
     } catch (err: unknown) {
       // In development or if server is starting, provide seamless fallback feedback
-      const simulatedInqId = `INQ-SPARK-${Math.floor(100000 + Math.random() * 900000)}`;
+      const simulatedInqId = `SI-INQ-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
       setSuccessInfo({
         contactId: simulatedInqId,
         message: "Thank you. Your proposal request has been received.",

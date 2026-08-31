@@ -43,6 +43,7 @@ export interface ApplicationItem {
 
 export interface ContactItem {
   _id: string;
+  contactReferenceId?: string;
   name: string;
   email: string;
   phone?: string;
@@ -73,7 +74,23 @@ export interface AnnouncementItem {
   link?: string;
   type: "info" | "success" | "warning";
   active: boolean;
+  order: number;
   createdAt: string;
+}
+
+export interface SettingsData {
+  siteName: string;
+  supportEmail: string;
+  salesEmail: string;
+  phone: string;
+  address: string;
+  maintenanceMode: boolean;
+  allowApplications: boolean;
+  announcement?: {
+    enabled: boolean;
+    text: string;
+    link?: string;
+  };
 }
 
 export interface WebsiteSettings {
@@ -96,6 +113,9 @@ export interface AuditLogItem {
   actorRole?: string;
   action: string;
   targetResource?: string;
+  userId?: string;
+  userEmail?: string;
+  userName?: string;
   ipAddress?: string;
   userAgent?: string;
   status: string;
@@ -165,7 +185,7 @@ export const publicApi = {
     budget?: string;
     timeline?: string;
     message: string;
-  }): Promise<{ success: boolean; message: string; contactId?: string }> {
+  }): Promise<{ success: boolean; message: string; contactId?: string; contactReferenceId?: string }> {
     const res = await fetch(`${API_BASE_URL}/api/v1/public/contact`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -218,8 +238,14 @@ export const publicApi = {
   },
 };
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  const token = localStorage.getItem("spark_admin_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 /**
- * Admin API client (Uses HttpOnly Cookies)
+ * Admin API client (Uses Bearer Token + HttpOnly Cookies)
  */
 export const adminApi = {
   async login(credentials: {
@@ -237,24 +263,50 @@ export const adminApi = {
     if (!res.ok) {
       throw new Error(json.error || json.message || "Invalid email or password");
     }
+    if (json.token && typeof window !== "undefined") {
+      localStorage.setItem("spark_admin_token", json.token);
+    }
     return json;
   },
 
   async logout() {
-    const res = await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-    return res.json();
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("spark_admin_token");
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+        method: "POST",
+        headers: {
+          ...getAuthHeaders(),
+        },
+        credentials: "include",
+      });
+      return await res.json();
+    } catch {
+      return { success: true };
+    }
   },
 
   async getMe() {
-    const res = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
-      credentials: "include",
-    });
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json.user || null;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
+        headers: {
+          ...getAuthHeaders(),
+        },
+        credentials: "include",
+      });
+      if (res.status === 401) {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("spark_admin_token");
+        }
+        return null;
+      }
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json.user || null;
+    } catch {
+      return null;
+    }
   },
 
   async forgotPassword(email: string) {
@@ -279,9 +331,17 @@ export const adminApi = {
 
   async getDashboardStats() {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/dashboard/stats`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
-    if (!res.ok) throw new Error("Unauthorized or server error");
+    if (!res.ok) {
+      if (res.status === 401 && typeof window !== "undefined") {
+        localStorage.removeItem("spark_admin_token");
+      }
+      throw new Error("Unauthorized or server error");
+    }
     const json = await res.json();
     return json.stats;
   },
@@ -289,6 +349,9 @@ export const adminApi = {
   // Internships
   async getAdminInternships(): Promise<InternshipItem[]> {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/internships`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     if (!res.ok) return [];
@@ -303,7 +366,10 @@ export const adminApi = {
   async createInternship(data: unknown) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/internships`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -315,7 +381,10 @@ export const adminApi = {
   async updateInternship(id: string, data: unknown) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/internships/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -327,11 +396,14 @@ export const adminApi = {
   async deleteInternship(id: string) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/internships/${id}`, {
       method: "DELETE",
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || json.message || "Failed to delete internship");
-    return json;
+    return json.data;
   },
 
   // Applications
@@ -344,6 +416,9 @@ export const adminApi = {
   async getApplications(params?: { status?: string; search?: string; page?: number; limit?: number }): Promise<{ applications: ApplicationItem[]; total: number }> {
     const query = toQueryString(params);
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/applications?${query}`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     if (!res.ok) return { applications: [], total: 0 };
@@ -354,7 +429,10 @@ export const adminApi = {
   async updateApplicationStatus(id: string, status: string, notes?: string) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/applications/${id}/status`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify({ status, notes }),
     });
@@ -366,6 +444,9 @@ export const adminApi = {
   async deleteApplication(id: string): Promise<{ success: boolean; message: string }> {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/applications/${id}`, {
       method: "DELETE",
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     const json = await res.json();
@@ -375,6 +456,9 @@ export const adminApi = {
 
   async getTrackApplicationCount(trackSlugOrId: string): Promise<number> {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/applications/track/${trackSlugOrId}/count`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     if (!res.ok) return 0;
@@ -385,6 +469,9 @@ export const adminApi = {
   async deleteTrackApplications(trackSlugOrId: string): Promise<{ success: boolean; message: string; deletedCount: number }> {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/applications/track/${trackSlugOrId}`, {
       method: "DELETE",
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     const json = await res.json();
@@ -399,7 +486,10 @@ export const adminApi = {
   ): Promise<{ success: boolean; message: string; data?: any }> {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/applications/${id}/email/${type}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -412,6 +502,9 @@ export const adminApi = {
   async getContacts(params?: { status?: string; search?: string; page?: number; limit?: number }): Promise<{ contacts: ContactItem[]; total: number }> {
     const query = toQueryString(params);
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/contacts?${query}`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     if (!res.ok) return { contacts: [], total: 0 };
@@ -422,7 +515,10 @@ export const adminApi = {
   async updateContactStatus(id: string, status: string, notes?: string) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/contacts/${id}/status`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify({ status, notes }),
     });
@@ -434,6 +530,9 @@ export const adminApi = {
   // Employees (CEO Only)
   async getEmployees(): Promise<UserItem[]> {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/employees`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     if (!res.ok) return [];
@@ -444,7 +543,10 @@ export const adminApi = {
   async createEmployee(data: { name: string; email: string; role?: string; permissions: string[]; password?: string }) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/employees`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -456,7 +558,10 @@ export const adminApi = {
   async updateEmployee(id: string, data: { name?: string; permissions?: string[]; status?: string; password?: string }) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/employees/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -468,6 +573,9 @@ export const adminApi = {
   // Careers
   async getAdminCareers(): Promise<CareerItem[]> {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/careers`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     if (!res.ok) return [];
@@ -478,7 +586,10 @@ export const adminApi = {
   async createCareer(data: unknown) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/careers`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -490,7 +601,10 @@ export const adminApi = {
   async updateCareer(id: string, data: unknown) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/careers/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -502,6 +616,9 @@ export const adminApi = {
   async deleteCareer(id: string) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/careers/${id}`, {
       method: "DELETE",
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     return res.json();
@@ -510,6 +627,9 @@ export const adminApi = {
   // Case Studies
   async getAdminCaseStudies(): Promise<CaseStudyItem[]> {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/case-studies`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     if (!res.ok) return CASE_STUDIES;
@@ -520,7 +640,10 @@ export const adminApi = {
   async createCaseStudy(data: unknown) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/case-studies`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -532,7 +655,10 @@ export const adminApi = {
   async updateCaseStudy(id: string, data: unknown) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/case-studies/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -544,6 +670,9 @@ export const adminApi = {
   async deleteCaseStudy(id: string) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/case-studies/${id}`, {
       method: "DELETE",
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     return res.json();
@@ -552,6 +681,9 @@ export const adminApi = {
   // FAQs
   async getAdminFAQs(): Promise<FAQItem[]> {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/faqs`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     if (!res.ok) return FAQS;
@@ -562,7 +694,10 @@ export const adminApi = {
   async createFAQ(data: unknown) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/faqs`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -574,7 +709,10 @@ export const adminApi = {
   async updateFAQ(id: string, data: unknown) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/faqs/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -586,6 +724,9 @@ export const adminApi = {
   async deleteFAQ(id: string) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/faqs/${id}`, {
       method: "DELETE",
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     return res.json();
@@ -594,6 +735,9 @@ export const adminApi = {
   // Announcements
   async getAdminAnnouncements(): Promise<AnnouncementItem[]> {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/announcements`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     if (!res.ok) return [];
@@ -604,7 +748,10 @@ export const adminApi = {
   async createAnnouncement(data: unknown) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/announcements`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -616,7 +763,10 @@ export const adminApi = {
   async updateAnnouncement(id: string, data: unknown) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/announcements/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -628,6 +778,9 @@ export const adminApi = {
   async deleteAnnouncement(id: string) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/announcements/${id}`, {
       method: "DELETE",
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     return res.json();
@@ -636,6 +789,9 @@ export const adminApi = {
   // Settings
   async getSettings(): Promise<WebsiteSettings | null> {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/settings`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     if (!res.ok) return null;
@@ -646,7 +802,10 @@ export const adminApi = {
   async updateSettings(data: unknown) {
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/settings`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -659,6 +818,9 @@ export const adminApi = {
   async getAuditLogs(params?: { page?: number; limit?: number }): Promise<{ logs: AuditLogItem[]; total: number }> {
     const query = toQueryString(params);
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/audit-logs?${query}`, {
+      headers: {
+        ...getAuthHeaders(),
+      },
       credentials: "include",
     });
     if (!res.ok) return { logs: [], total: 0 };

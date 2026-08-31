@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IContact extends Document {
+  contactReferenceId?: string;
   name: string;
   email: string;
   phone?: string;
@@ -24,6 +25,12 @@ export interface IContact extends Document {
 
 const ContactSchema = new Schema<IContact>(
   {
+    contactReferenceId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true,
+    },
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, lowercase: true, trim: true, index: true },
     phone: { type: String, trim: true },

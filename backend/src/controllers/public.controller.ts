@@ -181,21 +181,30 @@ export class PublicController {
     let resumeMimeType: string | undefined;
 
     if (req.file && req.file.buffer) {
-      const uploadResult = await GoogleDriveStorageService.uploadResume({
-        buffer: req.file.buffer,
-        originalFilename: req.file.originalname,
-        mimeType: req.file.mimetype,
-        candidateName,
-        applicationReferenceId,
-      });
+      try {
+        const uploadResult = await GoogleDriveStorageService.uploadResume({
+          buffer: req.file.buffer,
+          originalFilename: req.file.originalname,
+          mimeType: req.file.mimetype,
+          candidateName,
+          applicationReferenceId,
+        });
 
-      resumeFileId = uploadResult.fileId;
-      resumeKey = uploadResult.fileId;
-      resumeFileName = uploadResult.fileName;
-      resumeMimeType = uploadResult.mimeType;
-      resumeSize = uploadResult.size;
-      resumeStorageProvider = uploadResult.storageProvider;
-      resumeUrl = `/api/v1/admin/applications/${applicationReferenceId}/resume`;
+        resumeFileId = uploadResult.fileId;
+        resumeKey = uploadResult.fileId;
+        resumeFileName = uploadResult.fileName;
+        resumeMimeType = uploadResult.mimeType;
+        resumeSize = uploadResult.size;
+        resumeStorageProvider = uploadResult.storageProvider;
+        resumeUrl = `/api/v1/admin/applications/${applicationReferenceId}/resume`;
+      } catch (uploadErr: any) {
+        console.error("❌ [PublicController] Resume upload to Google Drive failed:", uploadErr.message);
+        res.status(502).json({
+          success: false,
+          error: "Unable to securely store your resume in Google Drive. Please try submitting again.",
+        });
+        return;
+      }
     }
 
     const application = await Application.create({
@@ -267,7 +276,10 @@ export class PublicController {
       return;
     }
 
+    const contactReferenceId = await ReferenceIdService.generateContactReferenceId();
+
     const contact = await Contact.create({
+      contactReferenceId,
       name: name.trim(),
       email: email.trim().toLowerCase(),
       phone: phone ? phone.trim() : undefined,
@@ -313,7 +325,8 @@ export class PublicController {
     res.status(201).json({
       success: true,
       message: "Thank you! Your project enquiry has been received.",
-      contactId: contact._id.toString(),
+      contactReferenceId: contact.contactReferenceId,
+      contactId: contact.contactReferenceId,
     });
   }
 

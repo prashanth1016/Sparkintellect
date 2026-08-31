@@ -556,12 +556,13 @@ export class EmailService {
       return { success: true, messageId: "mock-msg-id" };
     }
 
-    const contactId = contact._id.toString();
+    const contactRef = contact.contactReferenceId || "Inquiry";
     const formattedDate = new Date(contact.createdAt || Date.now()).toLocaleString();
 
-    const subject = "New Contact Enquiry — SparkIntellect";
+    const subject = `New Contact Enquiry [${contactRef}] — SparkIntellect`;
 
     const textContent = `New Contact Enquiry — SparkIntellect\n\n` +
+      `Inquiry Reference: ${contactRef}\n` +
       `Name: ${contact.name}\n` +
       `Email: ${contact.email}\n` +
       `Phone: ${contact.phone || "N/A"}\n` +
@@ -571,9 +572,10 @@ export class EmailService {
       `Timeline: ${contact.timeline || "N/A"}\n\n` +
       `Message:\n${contact.message}\n\n` +
       `Submitted: ${formattedDate}\n` +
-      `Contact Reference: ${contactId}`;
+      `Contact Reference: ${contactRef}`;
 
     const detailItems = [
+      { label: "Reference ID", value: contactRef },
       { label: "Name", value: contact.name },
       { label: "Email", value: contact.email, isLink: false },
       { label: "Phone", value: contact.phone || "N/A" },
@@ -589,7 +591,7 @@ export class EmailService {
       introParagraphs: ["A new client proposal / contact request has been received on the website."],
       detailsBox: { title: "Lead Information", items: detailItems },
       customSections: [{ title: "Submitted Message", content: contact.message }],
-      closingParagraphs: [`Submitted on ${formattedDate} • Ref: ${contactId}`],
+      closingParagraphs: [`Submitted on ${formattedDate} • Ref: ${contactRef}`],
     });
 
     try {
@@ -624,11 +626,13 @@ export class EmailService {
       return { success: true, messageId: "mock-msg-id" };
     }
 
+    const contactRef = contact.contactReferenceId || "";
     const subject = "Thank You for Contacting SparkIntellect";
 
     const textContent = `Hi ${contact.name || "there"},\n\n` +
       `Thank you for contacting SparkIntellect.\n\n` +
-      `We have successfully received your enquiry.\n\n` +
+      `We have successfully received your enquiry regarding our engineering services and solutions.\n\n` +
+      (contactRef ? `Inquiry Reference Number:\n${contactRef}\n\n` : "") +
       `Our team will review your message and get back to you shortly.\n\n` +
       `Regards,\nSparkIntellect\ninfo@sparkintellect.in`;
 
@@ -638,6 +642,7 @@ export class EmailService {
         "Thank you for reaching out to SparkIntellect.",
         "We have successfully received your enquiry regarding our engineering services and solutions.",
       ],
+      referenceId: contactRef || undefined,
       highlightBox: {
         content: "Our team will review your message and get back to you shortly.",
       },

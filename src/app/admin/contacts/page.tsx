@@ -158,6 +158,9 @@ export default function AdminContactsPage() {
                 contacts.map((c) => (
                   <tr key={c._id} className="hover:bg-[#F2F9FF]/50 transition-colors">
                     <td className="p-4">
+                      {c.contactReferenceId && (
+                        <div className="font-mono text-[10px] font-bold text-[#0284c7] mb-0.5">{c.contactReferenceId}</div>
+                      )}
                       <div className="font-bold text-[#0B1220]">{c.name}</div>
                       <div className="text-[11px] text-[#334155]">{c.email} {c.company ? `• ${c.company}` : ""}</div>
                     </td>
@@ -225,14 +228,16 @@ export default function AdminContactsPage() {
         </div>
       </div>
 
-      {/* Lead Detail Drawer */}
+      {/* Detail & Response Drawer */}
       {selectedContact && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex justify-end">
           <div className="w-full max-w-xl bg-white h-full shadow-2xl overflow-y-auto p-6 sm:p-8 space-y-6 animate-fadeIn">
             
             <div className="flex items-center justify-between border-b border-[#BEE0FF] pb-4">
               <div>
-                <span className="text-[10px] font-mono font-bold text-[#0284c7] uppercase">Lead Information</span>
+                <span className="text-[10px] font-mono font-bold text-[#0284c7] uppercase">
+                  {selectedContact.contactReferenceId ? `Lead Ref: ${selectedContact.contactReferenceId}` : "Lead Information"}
+                </span>
                 <h2 className="text-xl font-serif font-bold text-[#0B1220]">
                   {selectedContact.name}
                 </h2>

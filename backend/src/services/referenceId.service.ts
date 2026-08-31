@@ -110,6 +110,26 @@ export class ReferenceIdService {
   }
 
   /**
+   * Generates the next sequential Contact / Inquiry Reference ID for a given year (SI-INQ-YYYY-NNNN).
+   * Concurrency-safe via atomic MongoDB Counter.findOneAndUpdate with $inc.
+   */
+  static async generateContactReferenceId(contactDate: Date = new Date()): Promise<string> {
+    const year = contactDate.getFullYear();
+    const counterName = `contacts_${year}`;
+
+    const counter = await Counter.findOneAndUpdate(
+      { name: counterName },
+      { $inc: { seq: 1 } },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    const seqNumber = counter.seq;
+    const paddedSeq = String(seqNumber).padStart(4, "0");
+
+    return `SI-INQ-${year}-${paddedSeq}`;
+  }
+
+  /**
    * Formats a reference ID deterministically from components.
    */
   static formatReferenceId(trackCode: string, year: number, seq: number): string {

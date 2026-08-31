@@ -84,7 +84,7 @@ export class AuthController {
     res.cookie("spark_session", token, {
       httpOnly: true,
       secure: config.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: config.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -106,7 +106,7 @@ export class AuthController {
     res.clearCookie("spark_session", {
       httpOnly: true,
       secure: config.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: config.NODE_ENV === "production" ? "none" : "lax",
     });
 
     res.json({
