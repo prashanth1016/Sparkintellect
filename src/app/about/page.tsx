@@ -53,7 +53,7 @@ export default function AboutPage() {
 
             <div className="space-y-4 text-[#334155] text-base leading-relaxed">
               <p>
-                SparkIntellect was founded in Chennai, Tamil Nadu, India, with a bold vision: to bridge the gap between complex emerging Artificial Intelligence technologies and practical, scalable enterprise software. In a digital landscape saturated with generic offshore software agencies, Founder & CEO <strong className="text-[#0B1220]">Prashanth S</strong> set out to create an AI-first engineering house driven by senior technical leadership, transparent execution, and uncompromising code quality.
+                SparkIntellect was founded in Chennai, Tamil Nadu, India, with a bold vision: to bridge the gap between complex emerging Artificial Intelligence technologies and practical, scalable enterprise software. In a digital landscape saturated with generic offshore software agencies, Founder & CEO <strong className="text-[#0B1220]">Prashanth S</strong> and Co-Founder & CMO <strong className="text-[#0B1220]">Sakthi Pradeep T</strong> set out to create an AI-first engineering house driven by senior technical leadership, transparent execution, and uncompromising code quality.
               </p>
               <p>
                 What started as a focused team of AI architects and full-stack software engineers quickly grew into a trusted technology partner for startups, SMEs, and mid-market enterprises across retail, healthcare, manufacturing, education, and finance. We eliminate operational bottlenecks by building custom enterprise ERP systems, mobile applications, high-converting e-commerce engines, and autonomous workflow automation pipelines.
@@ -67,8 +67,8 @@ export default function AboutPage() {
                 <div className="text-sm font-serif font-bold text-[#0B1220]">{COMPANY_INFO.headquarters}</div>
               </div>
               <div className="p-4 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF]">
-                <div className="text-xs font-mono text-[#0284c7] uppercase font-bold mb-1">Founder & CEO</div>
-                <div className="text-sm font-serif font-bold text-[#0B1220]">{COMPANY_INFO.founder}</div>
+                <div className="text-xs font-mono text-[#0284c7] uppercase font-bold mb-1">Founding Leadership</div>
+                <div className="text-sm font-serif font-bold text-[#0B1220]">{COMPANY_INFO.founder} & {COMPANY_INFO.coFounder}</div>
               </div>
               <div className="p-4 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF]">
                 <div className="text-xs font-mono text-[#0284c7] uppercase font-bold mb-1">Core Specialization</div>

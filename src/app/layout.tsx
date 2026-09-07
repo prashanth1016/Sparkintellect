@@ -101,14 +101,14 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable} h-full antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${playfair.variable} ${inter.variable} h-full antialiased`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-white text-[#0B1220] font-sans selection:bg-[#9FCFFB] selection:text-[#0B1220]">
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-white text-[#0B1220] font-sans selection:bg-[#9FCFFB] selection:text-[#0B1220]">
         {children}
       </body>
     </html>
