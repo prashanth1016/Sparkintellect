@@ -21,18 +21,14 @@ import {
   Clock
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  try {
-    const internships = await publicApi.getInternships();
-    return internships.map((i) => ({ slug: i.slug }));
-  } catch {
-    return [];
-  }
-}
+
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;

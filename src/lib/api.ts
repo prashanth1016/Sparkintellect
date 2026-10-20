@@ -141,21 +141,47 @@ function toQueryString(params?: Record<string, string | number | undefined>): st
  */
 export const publicApi = {
   async getInternships(): Promise<InternshipItem[]> {
-    const res = await fetch(`${API_BASE_URL}/api/v1/public/internships`, {
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error("Failed to fetch internships from API");
-    const json = await res.json();
-    return Array.isArray(json.data) ? json.data : [];
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`${API_BASE_URL}/api/v1/public/internships`, {
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!res.ok) {
+        console.warn(`[publicApi.getInternships] Received HTTP ${res.status}`);
+        return [];
+      }
+      const json = await res.json();
+      return Array.isArray(json.data) ? json.data : [];
+    } catch (err: unknown) {
+      console.error("[publicApi.getInternships] Network or fetch error:", err instanceof Error ? err.message : err);
+      return [];
+    }
   },
 
   async getInternshipBySlug(slug: string): Promise<InternshipItem | null> {
-    const res = await fetch(`${API_BASE_URL}/api/v1/public/internships/${encodeURIComponent(slug)}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json.data || null;
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`${API_BASE_URL}/api/v1/public/internships/${encodeURIComponent(slug)}`, {
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!res.ok) {
+        if (res.status !== 404) {
+          console.warn(`[publicApi.getInternshipBySlug] Received HTTP ${res.status} for slug "${slug}"`);
+        }
+        return null;
+      }
+      const json = await res.json();
+      return json.data || null;
+    } catch (err: unknown) {
+      console.error(`[publicApi.getInternshipBySlug] Network or fetch error for "${slug}":`, err instanceof Error ? err.message : err);
+      return null;
+    }
   },
 
   async submitInternshipApplication(
@@ -211,21 +237,47 @@ export const publicApi = {
   },
 
   async getCareers(): Promise<CareerItem[]> {
-    const res = await fetch(`${API_BASE_URL}/api/v1/public/careers`, {
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error("Failed to fetch careers from API");
-    const json = await res.json();
-    return Array.isArray(json.data) ? json.data : [];
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`${API_BASE_URL}/api/v1/public/careers`, {
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!res.ok) {
+        console.warn(`[publicApi.getCareers] Received HTTP ${res.status}`);
+        return [];
+      }
+      const json = await res.json();
+      return Array.isArray(json.data) ? json.data : [];
+    } catch (err: unknown) {
+      console.error("[publicApi.getCareers] Network or fetch error:", err instanceof Error ? err.message : err);
+      return [];
+    }
   },
 
   async getCareerBySlug(slug: string): Promise<CareerItem | null> {
-    const res = await fetch(`${API_BASE_URL}/api/v1/public/careers/${encodeURIComponent(slug)}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json.data || null;
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`${API_BASE_URL}/api/v1/public/careers/${encodeURIComponent(slug)}`, {
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!res.ok) {
+        if (res.status !== 404) {
+          console.warn(`[publicApi.getCareerBySlug] Received HTTP ${res.status} for slug "${slug}"`);
+        }
+        return null;
+      }
+      const json = await res.json();
+      return json.data || null;
+    } catch (err: unknown) {
+      console.error(`[publicApi.getCareerBySlug] Network or fetch error for "${slug}":`, err instanceof Error ? err.message : err);
+      return null;
+    }
   },
 
   async getFaqs(): Promise<FAQItem[]> {
