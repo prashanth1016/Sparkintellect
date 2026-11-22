@@ -1,21 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+import { OfflineBanner } from "@/components/ui/OfflineBanner";
+import { NavigationProgress } from "@/components/ui/NavigationProgress";
 
-const playfair = Playfair_Display({
-  variable: "--font-serif",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const inter = Inter({
-  variable: "--font-sans",
-  subsets: ["latin"],
+const runiga = localFont({
+  src: "./fonts/Runiga.otf",
+  variable: "--font-runiga",
   display: "swap",
 });
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#EEEAF8",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -28,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | SparkIntellect",
   },
   description:
-    "Building Intelligent Digital Solutions for Businesses. Founded & Directed by Prashanth S in Guindy, Chennai. Premium AI, Software, Web, Mobile, Cloud & Internship Programs.",
+    "Building Intelligent Digital Solutions for Businesses. Founded & Directed by Mr. Prashanth in Chennai. Premium AI, Software, Web, Mobile, Cloud & Career Programs.",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -40,7 +36,7 @@ export const metadata: Metadata = {
   },
   keywords: [
     "SparkIntellect",
-    "Prashanth S",
+    "Mr. Prashanth",
     "AI Company Chennai",
     "AI Internships Chennai",
     "Custom Software Development",
@@ -48,7 +44,7 @@ export const metadata: Metadata = {
     "Flutter Mobile App",
     "ERP Software Chennai",
   ],
-  authors: [{ name: "Prashanth S", url: "https://sparkintellect.in" }],
+  authors: [{ name: "Mr. Prashanth", url: "https://sparkintellect.in" }],
   creator: "SparkIntellect",
   publisher: "SparkIntellect",
   robots: {
@@ -81,16 +77,16 @@ export default function RootLayout({
     "@type": "LocalBusiness",
     name: "SparkIntellect",
     url: "https://sparkintellect.in",
-    logo: "https://sparkintellect.in/logo.png",
+    logo: "https://sparkintellect.in/images/sparkintellect-logo-v2.png",
     description: "AI-first technology solutions company building custom software, AI models, web & mobile apps.",
     founder: {
       "@type": "Person",
-      name: "Prashanth S",
-      jobTitle: "Founder & Director",
+      name: "Mr. Prashanth",
+      jobTitle: "Founder & CEO",
     },
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Guindy",
+      streetAddress: "Chennai HQ",
       addressLocality: "Chennai",
       addressRegion: "Tamil Nadu",
       addressCountry: "India",
@@ -101,15 +97,17 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" suppressHydrationWarning className={`${playfair.variable} ${inter.variable} h-full antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${runiga.variable} h-full w-full antialiased dark`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body suppressHydrationWarning className="min-h-full flex flex-col bg-white text-[#0B1220] font-sans selection:bg-[#9FCFFB] selection:text-[#0B1220]">
+      <body suppressHydrationWarning className="min-h-full w-full flex flex-col bg-[#EEEAF8] text-[#2B2A6B] selection:bg-[#2B2A6B] selection:text-[#EEEAF8]">
+        <NavigationProgress />
         {children}
+        <OfflineBanner />
       </body>
     </html>
   );

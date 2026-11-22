@@ -7,21 +7,18 @@ import { BackgroundGrid } from "@/components/ui/BackgroundGrid";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 import { FloatingCTA } from "@/components/ui/FloatingCTA";
-import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { publicApi } from "@/lib/api";
 import { InternshipItem } from "@/data/companyData";
-import { 
-  GraduationCap, 
-  Sparkles, 
-  Send, 
-  CheckCircle2, 
-  UploadCloud, 
-  FileText, 
+import {
+  GraduationCap,
+  Send,
+  CheckCircle2,
+  UploadCloud,
+  FileText,
   AlertCircle,
   ArrowLeft,
   ArrowRight,
-  ShieldCheck,
-  Building
+  ShieldCheck
 } from "lucide-react";
 
 export default function DynamicInternshipApplyPage() {
@@ -155,10 +152,10 @@ export default function DynamicInternshipApplyPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#EEEAF8] flex items-center justify-center">
         <div className="text-center space-y-3">
-          <div className="w-10 h-10 border-4 border-[#9FCFFB] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs font-mono text-[#334155]">Loading Application Form...</p>
+          <div className="w-10 h-10 border-4 border-[#2B2A6B] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-xs font-mono text-[#2B2A6B]/70">Loading Application Form...</p>
         </div>
       </div>
     );
@@ -166,18 +163,18 @@ export default function DynamicInternshipApplyPage() {
 
   if (!internship) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <div className="luxury-card p-10 rounded-3xl border border-[#BEE0FF] text-center space-y-4 max-w-md shadow-lg">
-          <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+      <div className="min-h-screen bg-[#EEEAF8] flex items-center justify-center p-4">
+        <div className="glass-panel p-10 rounded-3xl border border-[#EEEAF8]/25 bg-[#2B2A6B]/95 text-[#EEEAF8] text-center space-y-4 max-w-md shadow-2xl">
+          <div className="w-12 h-12 rounded-2xl bg-[#1E1D4E] text-[#d4a373] flex items-center justify-center mx-auto border border-[#EEEAF8]/20">
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-serif font-bold text-[#0B1220]">Internship Not Found</h2>
-          <p className="text-xs text-[#334155] leading-relaxed">
+          <h2 className="text-xl font-display font-bold text-[#EEEAF8]">Internship Not Found</h2>
+          <p className="text-xs text-[#EEEAF8]/80 leading-relaxed">
             The requested internship track could not be found or is no longer published.
           </p>
           <Link
             href="/internships"
-            className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full font-bold text-xs bg-[#0B1220] text-white hover:bg-slate-800 transition-all"
+            className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full font-bold text-xs glass-btn-primary transition-all"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Return to Internships</span>
@@ -190,53 +187,55 @@ export default function DynamicInternshipApplyPage() {
   const isClosed = !internship.published || internship.status !== "open";
 
   return (
-    <div className="relative min-h-screen bg-white text-[#0B1220] selection:bg-[#9FCFFB] selection:text-[#0B1220]">
+    <div className="relative min-h-screen bg-[#EEEAF8] text-[#2B2A6B] font-sans selection:bg-[#2B2A6B] selection:text-[#EEEAF8]">
       <BackgroundGrid />
       <Navbar />
 
       <main className="relative z-10 pt-32 pb-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           {/* Top back button */}
           <div className="mb-6">
             <Link
               href={`/internships/${internship.slug}`}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#334155] hover:text-[#0B1220] transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2B2A6B]/80 hover:text-[#2B2A6B] transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to {internship.title} Details</span>
             </Link>
           </div>
 
-          <div className="luxury-card p-8 sm:p-12 rounded-3xl border border-[#BEE0FF] bg-white shadow-xl">
-            
+          <div className="glass-panel p-8 sm:p-12 rounded-3xl border border-[#EEEAF8]/25 bg-[#2B2A6B]/95 text-[#EEEAF8] shadow-2xl relative overflow-hidden">
+            {/* Ambient Glow Orb */}
+            <div className="absolute top-0 right-0 w-72 h-72 bg-[#d4a373]/15 rounded-full blur-3xl pointer-events-none" />
+
             {/* Header */}
-            <div className="text-center mb-8 space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#D6EBFF] text-[#0B1220]">
-                <GraduationCap className="w-3.5 h-3.5 text-[#0284c7]" />
+            <div className="text-center mb-8 space-y-2 relative z-10">
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#1E1D4E] border border-[#EEEAF8]/20 text-[#EEEAF8]">
+                <GraduationCap className="w-3.5 h-3.5 text-[#d4a373]" />
                 <span>Candidate Application Portal</span>
               </div>
 
-              <h1 className="text-3xl font-serif font-bold text-[#0B1220]">
+              <h1 className="text-3xl font-display font-bold text-[#EEEAF8] tracking-tight">
                 Apply for {internship.title}
               </h1>
 
-              <p className="text-xs sm:text-sm text-[#334155]">
-                Cohort: {internship.duration} • {internship.mode} • Guindy Tech Corridor, Chennai
+              <p className="text-xs sm:text-sm text-[#EEEAF8]/80">
+                Cohort: {internship.duration} • {internship.mode} • Chennai, India
               </p>
             </div>
 
             {/* If Closed */}
             {isClosed ? (
-              <div className="p-8 rounded-2xl bg-rose-50 border border-rose-200 text-center space-y-3">
-                <AlertCircle className="w-10 h-10 text-rose-500 mx-auto" />
-                <h3 className="text-lg font-bold text-rose-900">Applications Closed</h3>
-                <p className="text-xs text-rose-700 max-w-md mx-auto">
+              <div className="p-8 rounded-2xl bg-[#1E1D4E] border border-[#EEEAF8]/20 text-center space-y-3 relative z-10">
+                <AlertCircle className="w-10 h-10 text-[#d4a373] mx-auto" />
+                <h3 className="text-lg font-display font-bold text-[#EEEAF8]">Applications Closed</h3>
+                <p className="text-xs text-[#EEEAF8]/80 max-w-md mx-auto">
                   Applications for this internship track are currently closed. Please check other active domains or check back for the next cohort.
                 </p>
                 <Link
                   href="/internships"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-xs bg-[#0B1220] text-white hover:bg-slate-800 transition-all mt-2"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-xs glass-btn-primary transition-all mt-2"
                 >
                   <span>View All Open Tracks</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -244,24 +243,24 @@ export default function DynamicInternshipApplyPage() {
               </div>
             ) : successResult ? (
               /* Success confirmation state */
-              <div className="text-center py-10 space-y-5 animate-fadeIn">
-                <div className="w-16 h-16 rounded-full bg-[#D6EBFF] border border-[#BEE0FF] text-[#0284c7] flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-9 h-9 text-[#0284c7]" />
+              <div className="text-center py-10 space-y-5 animate-fadeIn relative z-10">
+                <div className="w-16 h-16 rounded-full bg-[#1E1D4E] border border-[#EEEAF8]/30 text-[#d4a373] flex items-center justify-center mx-auto shadow-lg shadow-[#1E1D4E]/50">
+                  <CheckCircle2 className="w-9 h-9 text-[#d4a373]" />
                 </div>
 
                 <div className="space-y-2">
-                  <h2 className="text-2xl font-serif font-bold text-[#0B1220]">
+                  <h2 className="text-2xl font-display font-bold text-[#EEEAF8]">
                     Application Submitted Successfully!
                   </h2>
-                  <p className="text-xs text-[#334155] max-w-md mx-auto">
-                    {successResult.message} Your resume and candidate responses have been securely stored.
+                  <p className="text-xs text-[#EEEAF8]/80 max-w-md mx-auto">
+                    {successResult.message} Your resume and responses have been securely recorded.
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF] inline-block text-left max-w-sm w-full space-y-1.5">
-                  <div className="text-[10px] font-mono uppercase text-[#334155]">Application Reference ID:</div>
-                  <div className="text-sm font-mono font-bold text-[#0284c7]">{successResult.applicationId}</div>
-                  <div className="text-[11px] text-[#334155] pt-1">
+                <div className="p-4 rounded-2xl glass-card border border-[#EEEAF8]/20 bg-[#1E1D4E] inline-block text-left max-w-sm w-full space-y-1.5">
+                  <div className="text-[10px] font-mono uppercase text-[#EEEAF8]/70">Application Reference ID:</div>
+                  <div className="text-sm font-mono font-bold text-[#d4a373]">{successResult.applicationId}</div>
+                  <div className="text-[11px] text-[#EEEAF8]/80 pt-1">
                     Our technical recruitment team will review your submission and contact you via email or phone.
                   </div>
                 </div>
@@ -269,13 +268,13 @@ export default function DynamicInternshipApplyPage() {
                 <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link
                     href="/internships"
-                    className="px-6 py-2.5 rounded-xl font-semibold text-xs bg-[#F2F9FF] text-[#0B1220] border border-[#BEE0FF] hover:bg-[#D6EBFF] transition-all"
+                    className="px-6 py-2.5 rounded-xl font-semibold text-xs glass-card text-[#EEEAF8]/90 hover:border-[#d4a373]/50 transition-all"
                   >
-                    Browse Other Opportunities
+                    Browse Other Tracks
                   </Link>
                   <Link
                     href="/"
-                    className="px-6 py-2.5 rounded-xl font-bold text-xs bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] transition-all"
+                    className="px-6 py-2.5 rounded-xl font-bold text-xs glass-btn-primary transition-all"
                   >
                     Return to Homepage
                   </Link>
@@ -283,9 +282,9 @@ export default function DynamicInternshipApplyPage() {
               </div>
             ) : (
               /* Dynamic Form Builder Renderer */
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
                 {errorMsg && (
-                  <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                  <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{errorMsg}</span>
                   </div>
@@ -299,10 +298,10 @@ export default function DynamicInternshipApplyPage() {
                       if (field.type === "file") {
                         return (
                           <div key={field.id || field.name} className="space-y-1.5">
-                            <label className="block text-xs font-semibold text-[#0B1220]">
-                              {field.label} {field.required && <span className="text-rose-500">*</span>}
+                            <label className="block text-xs font-semibold text-[#EEEAF8]">
+                              {field.label} {field.required && <span className="text-[#d4a373]">*</span>}
                             </label>
-                            <div className="border-2 border-dashed border-[#BEE0FF] hover:border-[#9FCFFB] rounded-2xl p-6 text-center bg-[#F2F9FF] transition-colors relative">
+                            <div className="border-2 border-dashed border-[#EEEAF8]/20 hover:border-[#d4a373]/50 rounded-2xl p-6 text-center bg-[#1E1D4E]/60 hover:bg-[#1E1D4E] transition-colors relative">
                               <input
                                 type="file"
                                 accept=".pdf,.doc,.docx"
@@ -311,18 +310,18 @@ export default function DynamicInternshipApplyPage() {
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                               />
                               <div className="flex flex-col items-center justify-center space-y-2 pointer-events-none">
-                                <UploadCloud className="w-8 h-8 text-[#0284c7]" />
+                                <UploadCloud className="w-8 h-8 text-[#d4a373]" />
                                 {fileName ? (
-                                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#0B1220]">
-                                    <FileText className="w-4 h-4 text-[#0284c7]" />
+                                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#EEEAF8]">
+                                    <FileText className="w-4 h-4 text-[#d4a373]" />
                                     <span>{fileName}</span>
                                   </div>
                                 ) : (
                                   <>
-                                    <span className="text-xs font-semibold text-[#0B1220]">
+                                    <span className="text-xs font-semibold text-[#EEEAF8]">
                                       Click to upload or drag and drop your Resume
                                     </span>
-                                    <span className="text-[10px] text-[#334155]">
+                                    <span className="text-[10px] text-[#EEEAF8]/60">
                                       PDF, DOC, DOCX (Max size: 5MB)
                                     </span>
                                   </>
@@ -336,8 +335,8 @@ export default function DynamicInternshipApplyPage() {
                       if (field.type === "textarea") {
                         return (
                           <div key={field.id || field.name} className="space-y-1.5">
-                            <label className="block text-xs font-semibold text-[#0B1220]">
-                              {field.label} {field.required && <span className="text-rose-500">*</span>}
+                            <label className="block text-xs font-semibold text-[#EEEAF8]">
+                              {field.label} {field.required && <span className="text-[#d4a373]">*</span>}
                             </label>
                             <textarea
                               rows={3}
@@ -345,7 +344,7 @@ export default function DynamicInternshipApplyPage() {
                               value={answers[field.name] || ""}
                               onChange={(e) => handleInputChange(field.name, e.target.value)}
                               placeholder={field.placeholder || ""}
-                              className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-xs focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
+                              className="w-full px-4 py-3 rounded-xl bg-[#1E1D4E] border border-[#EEEAF8]/20 text-[#EEEAF8] text-xs focus:border-[#d4a373] focus:ring-1 focus:ring-[#d4a373] focus:outline-none transition-colors placeholder-[#EEEAF8]/40"
                             />
                           </div>
                         );
@@ -354,17 +353,17 @@ export default function DynamicInternshipApplyPage() {
                       if (field.type === "select") {
                         return (
                           <div key={field.id || field.name} className="space-y-1.5">
-                            <label className="block text-xs font-semibold text-[#0B1220]">
-                              {field.label} {field.required && <span className="text-rose-500">*</span>}
+                            <label className="block text-xs font-semibold text-[#EEEAF8]">
+                              {field.label} {field.required && <span className="text-[#d4a373]">*</span>}
                             </label>
                             <select
                               required={field.required}
                               value={answers[field.name] || ""}
                               onChange={(e) => handleInputChange(field.name, e.target.value)}
-                              className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-xs focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
+                              className="w-full px-4 py-3 rounded-xl bg-[#1E1D4E] border border-[#EEEAF8]/20 text-[#EEEAF8] text-xs focus:border-[#d4a373] focus:ring-1 focus:ring-[#d4a373] focus:outline-none transition-colors"
                             >
                               {field.options?.map((opt) => (
-                                <option key={opt} value={opt}>
+                                <option key={opt} value={opt} className="bg-[#1E1D4E] text-[#EEEAF8]">
                                   {opt}
                                 </option>
                               ))}
@@ -375,8 +374,8 @@ export default function DynamicInternshipApplyPage() {
 
                       return (
                         <div key={field.id || field.name} className="space-y-1.5">
-                          <label className="block text-xs font-semibold text-[#0B1220]">
-                            {field.label} {field.required && <span className="text-rose-500">*</span>}
+                          <label className="block text-xs font-semibold text-[#EEEAF8]">
+                            {field.label} {field.required && <span className="text-[#d4a373]">*</span>}
                           </label>
                           <input
                             type={field.type}
@@ -384,7 +383,7 @@ export default function DynamicInternshipApplyPage() {
                             value={answers[field.name] || ""}
                             onChange={(e) => handleInputChange(field.name, e.target.value)}
                             placeholder={field.placeholder || ""}
-                            className="w-full px-4 py-3 rounded-xl bg-white border border-[#BEE0FF] text-[#0B1220] text-xs focus:border-[#9FCFFB] focus:ring-2 focus:ring-[#9FCFFB]/40 focus:outline-none transition-colors"
+                            className="w-full px-4 py-3 rounded-xl bg-[#1E1D4E] border border-[#EEEAF8]/20 text-[#EEEAF8] text-xs focus:border-[#d4a373] focus:ring-1 focus:ring-[#d4a373] focus:outline-none transition-colors placeholder-[#EEEAF8]/40"
                           />
                         </div>
                       );
@@ -392,23 +391,23 @@ export default function DynamicInternshipApplyPage() {
                 </div>
 
                 {/* Cloudflare Turnstile note */}
-                <div className="p-3 rounded-xl bg-[#F2F9FF] border border-[#BEE0FF] flex items-center justify-between text-[11px] text-[#334155]">
+                <div className="p-3 rounded-xl bg-[#1E1D4E] border border-[#EEEAF8]/15 flex items-center justify-between text-[11px] text-[#EEEAF8]/70">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-[#0284c7]" />
+                    <ShieldCheck className="w-4 h-4 text-[#d4a373]" />
                     <span>Protected by Cloudflare Turnstile & Strict Rate Limiting</span>
                   </div>
-                  <span className="font-mono text-emerald-600 font-bold">SECURE</span>
+                  <span className="font-mono text-[#d4a373] font-bold">SECURE</span>
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full py-4 rounded-xl font-bold text-sm bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-lg shadow-[#9FCFFB]/30 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+                  className="w-full py-4 rounded-xl font-display font-bold text-sm tracking-wider uppercase glass-btn-primary flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-50"
                 >
                   {submitting ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-[#0B1220] border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-[#2B2A6B] border-t-transparent rounded-full animate-spin" />
                       <span>Validating & Uploading Resume...</span>
                     </div>
                   ) : (
@@ -419,7 +418,7 @@ export default function DynamicInternshipApplyPage() {
                   )}
                 </button>
 
-                <p className="text-center text-[11px] text-[#334155]">
+                <p className="text-center text-[11px] text-[#EEEAF8]/60">
                   By submitting, you confirm that the information provided is accurate and agree to SparkIntellect&apos;s privacy policy.
                 </p>
               </form>

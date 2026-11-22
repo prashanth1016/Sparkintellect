@@ -6,6 +6,7 @@ import { Application } from "../models/Application.js";
 import { Contact } from "../models/Contact.js";
 import { User } from "../models/User.js";
 import { Career } from "../models/Career.js";
+import { CareerApplication } from "../models/CareerApplication.js";
 import { CaseStudy } from "../models/CaseStudy.js";
 import { FAQ } from "../models/FAQ.js";
 import { Announcement } from "../models/Announcement.js";
@@ -705,6 +706,100 @@ export class AdminController {
     }
     await Career.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: "Career deleted." });
+  }
+
+  // Career Applications Management
+  static async getCareerApplications(req: AuthRequest, res: Response): Promise<void> {
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 15));
+    const skip = (page - 1) * limit;
+
+    const query: any = {};
+    if (req.query.status && req.query.status !== "all") {
+      query.status = req.query.status;
+    }
+    if (req.query.search) {
+      const searchStr = (req.query.search as string).trim();
+      query.$or = [
+        { applicationReferenceId: { $regex: searchStr, $options: "i" } },
+        { "personalInfo.fullName": { $regex: searchStr, $options: "i" } },
+        { "personalInfo.email": { $regex: searchStr, $options: "i" } },
+        { careerTitle: { $regex: searchStr, $options: "i" } },
+      ];
+    }
+
+    const [applications, total] = await Promise.all([
+      CareerApplication.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      CareerApplication.countDocuments(query),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        applications,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  }
+
+  static async updateCareerApplicationStatus(req: AuthRequest, res: Response): Promise<void> {
+    const { id } = req.params;
+    const { status, notes } = req.body;
+
+    const app = await CareerApplication.findById(id);
+    if (!app) {
+      res.status(404).json({ success: false, error: "Career application not found." });
+      return;
+    }
+
+    if (status) app.status = status;
+    if (notes !== undefined) app.notes = notes;
+    await app.save();
+
+    res.json({ success: true, data: app });
+  }
+
+  static async deleteCareerApplication(req: AuthRequest, res: Response): Promise<void> {
+    const { id } = req.params;
+    const app = await CareerApplication.findById(id);
+    if (!app) {
+      res.status(404).json({ success: false, error: "Career application not found." });
+      return;
+    }
+
+    await CareerApplication.findByIdAndDelete(id);
+    res.json({ success: true, message: "Career application deleted successfully." });
+  }
+
+  static async downloadCareerResume(req: AuthRequest, res: Response): Promise<void> {
+    const { id } = req.params;
+    const app = await CareerApplication.findOne({
+      $or: [{ _id: isValidObjectId(id) ? id : null }, { applicationReferenceId: id }],
+    });
+
+    if (!app || !app.resumeFileId) {
+      res.status(404).json({ success: false, error: "Resume file not found." });
+      return;
+    }
+
+    try {
+      const storageProvider = (app as any).storageProvider || "local";
+      const downloadResult = await GoogleDriveStorageService.downloadResumeStream(app.resumeFileId, storageProvider);
+      res.setHeader("Content-Type", downloadResult.mimeType || "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${encodeURIComponent(downloadResult.fileName || app.resumeFileName || "resume.pdf")}"`
+      );
+      if (downloadResult.size) {
+        res.setHeader("Content-Length", downloadResult.size);
+      }
+      downloadResult.stream.pipe(res);
+    } catch (err: any) {
+      console.error(`❌ [AdminController] Failed to stream career resume (${app.resumeFileId}):`, err.message);
+      res.status(404).json({ success: false, error: "Resume file not found or could not be streamed." });
+    }
   }
 
   static async getCaseStudies(req: AuthRequest, res: Response): Promise<void> {

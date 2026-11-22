@@ -181,13 +181,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Top Brand Header */}
         <div className="p-5 border-b border-[#BEE0FF] flex items-center justify-between">
           <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#0B1220] p-1 flex items-center justify-center">
+            <div className="h-8 w-auto flex items-center bg-[#0B1220] px-2.5 py-1 rounded-lg">
               <Image
-                src="/logo.png"
+                src="/images/sparkintellect-logo-v2.png"
                 alt="SparkIntellect"
-                width={28}
-                height={28}
-                className="w-full h-full object-cover rounded"
+                width={120}
+                height={24}
+                className="h-6 w-auto object-contain"
               />
             </div>
             <div className="flex flex-col">

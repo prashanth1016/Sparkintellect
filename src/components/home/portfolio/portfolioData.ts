@@ -1,0 +1,188 @@
+import { PortfolioProduct } from "./types";
+
+export const PORTFOLIO_PRODUCTS: PortfolioProduct[] = [
+  {
+    id: "ai-copilots",
+    number: "01",
+    category: "AI & INTELLIGENCE",
+    name: "AI Assistants & Copilots",
+    tagline: "Autonomous Agent Tooling & Sub-100ms Inference",
+    description:
+      "Domain-trained conversational neural models, intelligent internal knowledge bases, and autonomous multi-agent copilots engineered for customer support and complex workflow automation.",
+    deliverables: [
+      "Domain Vector RAG & Semantic Search",
+      "Autonomous Multi-Agent Tool Calling",
+      "Private LLM Self-Hosting & Guardrails",
+      "Sub-100ms Streaming Inference",
+    ],
+    technologies: ["Python", "FastAPI", "LangChain", "Qdrant", "vLLM", "OpenAI"],
+    visualType: "ai",
+    href: "/services/ai-development",
+    metrics: {
+      value: "94.8%",
+      label: "Query Acceleration",
+      subtext: "Enterprise RAG retrieval benchmark across 1M+ technical documents",
+    },
+  },
+  {
+    id: "custom-erp",
+    number: "02",
+    category: "ENTERPRISE SYSTEMS",
+    name: "Custom ERP Systems",
+    tagline: "Multi-Tier Approval Engines & Ledger Synchronization",
+    description:
+      "Tailored enterprise resource planning platforms unifying inventory tracking, automated procurement, field site logs, and multi-entity financial ledgers into one secure system.",
+    deliverables: [
+      "Role-Based Granular Permissions (ACL)",
+      "Real-Time Multi-Location Inventory Sync",
+      "Automated Multi-Tier Purchase Approvals",
+      "Immutable Audit Logs & Financial Telemetry",
+    ],
+    technologies: ["Next.js", "Node.js", "PostgreSQL", "Prisma", "Redis", "Docker"],
+    visualType: "erp",
+    href: "/services/enterprise-software",
+    metrics: {
+      value: "4.2x",
+      label: "Ops Cycle Speed",
+      subtext: "Reduction in cross-department purchase and procurement approval latency",
+    },
+  },
+  {
+    id: "crm-platforms",
+    number: "03",
+    category: "SALES AUTOMATION",
+    name: "CRM & Lead Platforms",
+    tagline: "Intelligent Lead Scoring & WhatsApp Cloud Pipeline",
+    description:
+      "High-conversion customer relationship engines equipped with algorithmic lead prioritization, automated round-robin distribution, and sub-60-second WhatsApp customer journeys.",
+    deliverables: [
+      "Dynamic Algorithmic Lead Scoring",
+      "Official WhatsApp Cloud API Ingestion",
+      "Multi-Channel Sales Pipeline Stages",
+      "Real-Time Conversion Telemetry & SLA Tracking",
+    ],
+    technologies: ["React", "TypeScript", "Tailwind CSS", "MongoDB", "RabbitMQ", "Kafka"],
+    visualType: "crm",
+    href: "/services/automation",
+    metrics: {
+      value: "+62%",
+      label: "Lead Capture Rate",
+      subtext: "Measured conversion uplift via instant WhatsApp engagement automation",
+    },
+  },
+  {
+    id: "client-portals",
+    number: "04",
+    category: "WEB APPLICATIONS",
+    name: "Customer & Vendor Portals",
+    tagline: "Self-Service Digital Hubs & AES-256 Vaults",
+    description:
+      "High-security self-service client and supplier workspaces for automated invoice generation, live milestone inspection, dispute resolution, and encrypted document sharing.",
+    deliverables: [
+      "AES-256 Encrypted Document Vault",
+      "Milestone Tracking & Sign-Off Workflows",
+      "Instant Payment Gateway & Invoice Settlement",
+      "Granular Multi-Tenant Vendor Permissions",
+    ],
+    technologies: ["Next.js", "TypeScript", "Tailwind CSS", "PostgreSQL", "AWS S3", "Stripe"],
+    visualType: "portal",
+    href: "/services/web-development",
+    metrics: {
+      value: "-48%",
+      label: "Support Ticket Drop",
+      subtext: "Customer ticket volume reduction following portal self-service adoption",
+    },
+  },
+  {
+    id: "ecommerce-platforms",
+    number: "05",
+    category: "DIGITAL COMMERCE",
+    name: "E-Commerce Platforms",
+    tagline: "Ultra-Fast Headless Storefronts & Atomic Inventory Locks",
+    description:
+      "Modern headless commerce architectures with sub-second page loads, atomic inventory concurrency locking, multi-currency checkout, and seamless courier logistics integrations.",
+    deliverables: [
+      "Headless Next.js Edge Storefront",
+      "Atomic Inventory Reservation Locks",
+      "Sub-Second Edge Checkout & Payment Rails",
+      "Automated Courier & Fulfillment Sync",
+    ],
+    technologies: ["Next.js", "GraphQL", "Node.js", "Redis", "Stripe", "PostgreSQL"],
+    visualType: "commerce",
+    href: "/services/web-development",
+    metrics: {
+      value: "280ms",
+      label: "Edge Cart Velocity",
+      subtext: "Sub-second edge checkout latency under peak concurrent transaction spikes",
+    },
+  },
+  {
+    id: "mobile-apps",
+    number: "06",
+    category: "MOBILE ENGINEERING",
+    name: "Native Mobile Applications",
+    tagline: "Offline SQLite Synchronization & Native Biometrics",
+    description:
+      "High-performance cross-platform and native mobile applications crafted with Flutter and React Native for on-site field staff, enterprise logistics, and direct consumer experiences.",
+    deliverables: [
+      "Offline SQLite Two-Way Synchronization",
+      "Hardware Biometric Authentication (FaceID/Fingerprint)",
+      "High-Frequency Push Notification Pipeline",
+      "Background Geolocation & Route Optimization",
+    ],
+    technologies: ["Flutter", "React Native", "Dart", "Swift", "Kotlin", "Firebase"],
+    visualType: "mobile",
+    href: "/services/mobile-development",
+    metrics: {
+      value: "99.98%",
+      label: "Crash-Free Sessions",
+      subtext: "Field staff stability benchmark across 250,000+ continuous mobile sessions",
+    },
+  },
+  {
+    id: "workflow-automation",
+    number: "07",
+    category: "PROCESS AUTOMATION",
+    name: "Workflow Automation Engines",
+    tagline: "Distributed Queues & Zero-Loss Webhook Buses",
+    description:
+      "Event-driven automation networks connecting distributed ERPs, CRMs, billing systems, and external third-party APIs with guaranteed zero message loss and autonomous retry queues.",
+    deliverables: [
+      "Event-Driven Distributed Worker Queues",
+      "Zero-Loss Webhook Bus & Payload Parser",
+      "Autonomous Fault Tolerance & Self-Healing Retries",
+      "Real-Time Pipeline Latency Telemetry",
+    ],
+    technologies: ["Go", "Node.js", "RabbitMQ", "Redis", "BullMQ", "Docker"],
+    visualType: "automation",
+    href: "/services/automation",
+    metrics: {
+      value: "3,800 hrs",
+      label: "Manual Hours Saved",
+      subtext: "Annual operational workload automated across backend data workflows",
+    },
+  },
+  {
+    id: "data-analytics",
+    number: "08",
+    category: "DATA & ANALYTICS",
+    name: "Centralized Data Platforms",
+    tagline: "Sub-Second OLAP Engines & Real-Time BI Telemetry",
+    description:
+      "Unified enterprise data lakehouses, automated streaming ETL pipelines, and low-latency executive analytics dashboards designed for instant business intelligence reporting.",
+    deliverables: [
+      "Real-Time Streaming ETL & Schema Normalization",
+      "Columnar Data Warehouse Architecture",
+      "Low-Latency Executive KPI Dashboards",
+      "Automated Regulatory & Compliance Exports",
+    ],
+    technologies: ["ClickHouse", "PostgreSQL", "Apache Kafka", "Python", "Grafana", "DuckDB"],
+    visualType: "analytics",
+    href: "/services/cloud-devops",
+    metrics: {
+      value: "< 1.8s",
+      label: "Data Ingestion Latency",
+      subtext: "End-to-end stream latency from edge event generation to executive dashboard",
+    },
+  },
+];

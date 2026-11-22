@@ -18,7 +18,7 @@ const SOLUTION_STEPS = [
 
 export const SolutionsSection: React.FC = () => {
   return (
-    <SectionWrapper className="py-20 bg-white">
+    <SectionWrapper className="py-24 bg-[#0B0B0E] border-t border-[rgba(198,202,208,0.14)] relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <SectionHeading
@@ -34,14 +34,14 @@ export const SolutionsSection: React.FC = () => {
             const Icon = item.icon;
             return (
               <GridStaggerItem key={item.step} index={idx}>
-                <div className="p-5 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF] hover:border-[#9FCFFB] hover:shadow-md transition-all h-full flex flex-col justify-between">
+                <div className="p-5 rounded-2xl bg-[#111115] border border-[rgba(198,202,208,0.14)] hover:border-[#FF1744]/40 hover:bg-[#1a080d] hover:shadow-lg transition-all h-full flex flex-col justify-between group">
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-mono font-bold text-[#0284c7]">{item.step}</span>
-                      <Icon className="w-4 h-4 text-[#334155]" />
+                      <span className="text-xs font-mono font-bold text-[#FF1744]">{item.step}</span>
+                      <Icon className="w-4 h-4 text-[#A6A9B0] group-hover:text-white transition-colors" />
                     </div>
-                    <h3 className="text-sm font-bold text-[#0B1220] mb-1.5">{item.title}</h3>
-                    <p className="text-[11px] text-[#334155] leading-relaxed">{item.desc}</p>
+                    <h3 className="text-sm font-display font-bold text-white mb-1.5">{item.title}</h3>
+                    <p className="text-[11px] text-[#A6A9B0] leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               </GridStaggerItem>
@@ -50,19 +50,19 @@ export const SolutionsSection: React.FC = () => {
         </div>
 
         {/* CTA Card */}
-        <div className="luxury-card p-8 sm:p-10 rounded-3xl border border-[#BEE0FF] bg-[#F2F9FF] flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+        <div className="cinematic-card p-8 sm:p-10 rounded-3xl border border-[rgba(198,202,208,0.16)] bg-[#111115] flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="space-y-2 text-left">
-            <h3 className="text-2xl font-serif font-bold text-[#0B1220]">
+            <h3 className="text-2xl font-display font-bold text-white">
               Ready to architect your custom software solution?
             </h3>
-            <p className="text-sm text-[#334155]">
-              Schedule a 30-minute discovery consultation with Founder & CEO Prashanth S.
+            <p className="text-sm text-[#A6A9B0]">
+              Schedule a 30-minute discovery consultation with Founder & CEO Mr. Prashanth.
             </p>
           </div>
 
           <Link
             href="/solutions"
-            className="px-8 py-4 rounded-full font-bold text-xs bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-md transition-all flex items-center gap-2 shrink-0"
+            className="px-8 py-4 rounded-full font-bold text-xs btn-ruby-primary shadow-lg transition-all flex items-center gap-2 shrink-0"
           >
             <span>Build Your Solution</span>
             <ArrowRight className="w-4 h-4" />

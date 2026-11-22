@@ -109,16 +109,16 @@ export interface InternshipItem {
 export const COMPANY_INFO = {
   name: "SparkIntellect",
   tagline: "We Build Intelligent Software for Businesses Ready to Grow",
-  founder: "Prashanth S",
+  founder: "Mr. Prashanth",
   founderRole: "Founder & CEO",
   founderBio: "AI Architect and software entrepreneur passionate about engineering scalable, high-integrity digital platforms. SparkIntellect bridges the gap between modern frontier AI systems and enterprise business execution.",
-  coFounder: "Sakthi Pradeep T",
-  coFounderRole: "Co-Founder & CMO",
-  coFounderBio: "Strategic growth leader and marketing strategist driving brand positioning, corporate outreach, client acquisition, and market expansion. Sakthi ensures SparkIntellect's cutting-edge AI and software solutions reach global enterprises with high impact and measurable business ROI.",
-  headquarters: "Guindy Tech Corridor, Chennai, Tamil Nadu, India",
-  address: "Guindy, Chennai, Tamil Nadu - 600032, India",
-  phone: "+91 8977177634",
-  whatsapp: "+91 8977177634",
+  coFounder: "Mr. Pranesh Rajagopal",
+  coFounderRole: "Co-Founder & Managing Director",
+  coFounderBio: "Strategic growth leader and managing director driving executive operations, client partnerships, corporate governance, and organizational expansion. Mr. Pranesh ensures SparkIntellect's cutting-edge AI and enterprise software solutions deliver enduring business ROI.",
+  headquarters: "Chennai, Tamil Nadu, India",
+  address: "Chennai, Tamil Nadu - 600032, India",
+  phone: "+91 9943177634",
+  whatsapp: "+91 9943177634",
   email: "info@sparkintellect.in",
   careersEmail: "careers@sparkintellect.in",
   website: "https://sparkintellect.in",
@@ -126,9 +126,10 @@ export const COMPANY_INFO = {
   apiUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
   workingHours: "Mon – Sat: 9:00 AM – 7:00 PM IST | Sun: Closed",
   socials: {
-    linkedin: "https://linkedin.com/company/sparkintellect.in",
+    linkedin: "https://linkedin.com/company/sparkintellect",
+    prashanthLinkedin: "https://linkedin.com/in/prashanth1416",
     twitter: "https://twitter.com/sparkintellect.in",
-    instagram: "https://instagram.com/sparkintellect.in",
+    instagram: "https://instagram.com/sparkintellect_in",
     github: "https://github.com/sparkintellect",
   },
   vision: "To build a world-class technology firm creating intelligent, high-leverage software products and platforms that streamline operations and accelerate human potential.",
@@ -721,7 +722,7 @@ export const FAQS = [
   },
   {
     q: "Where is SparkIntellect located?",
-    a: "Our headquarters is located in the Guindy Tech Corridor in Chennai, Tamil Nadu, India. We serve client enterprises across India, North America, Europe, and the Middle East."
+    a: "Our headquarters is located in Chennai, Tamil Nadu, India. We serve client enterprises across India, North America, Europe, and the Middle East."
   },
   {
     q: "How does SparkIntellect differ from a generic agency?",
@@ -729,7 +730,7 @@ export const FAQS = [
   },
   {
     q: "How are internships structured at SparkIntellect?",
-    a: "Our internships run for 3 to 6 months across AI/ML, Full-Stack Web, Mobile Apps, and Cloud. Interns work directly on production-grade software with 1-on-1 mentorship from Founder Prashanth S and senior developers, with official verified certificates and pre-placement offer (PPO) pathways."
+    a: "Our internships run for 3 to 6 months across AI/ML, Full-Stack Web, Mobile Apps, and Cloud. Interns work directly on production-grade software with 1-on-1 mentorship from Founder & CEO Mr. Prashanth and senior developers, with official verified certificates and pre-placement offer (PPO) pathways."
   },
   {
     q: "What is your project pricing and delivery timeline?",

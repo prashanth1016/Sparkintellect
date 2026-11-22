@@ -24,11 +24,11 @@ export const metadata: Metadata = {
 
 export default function SupportPage() {
   return (
-    <div className="relative min-h-screen bg-white text-[#0B1220] selection:bg-[#9FCFFB] selection:text-[#0B1220]">
+    <div className="relative min-h-screen w-full max-w-full overflow-x-hidden bg-[#EEEAF8] text-[#2B2A6B] selection:bg-[#2B2A6B] selection:text-[#EEEAF8]">
       <BackgroundGrid />
       <Navbar />
 
-      <main className="relative z-10 pt-32 pb-24">
+      <main className="relative z-10 pt-28 sm:pt-32 pb-20 sm:pb-24 w-full max-w-full overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <SectionHeading
@@ -41,113 +41,113 @@ export default function SupportPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             
             <GridStaggerItem index={0}>
-              <div className="luxury-card p-8 rounded-3xl border border-[#BEE0FF] bg-white shadow-md space-y-4 h-full">
-                <div className="w-12 h-12 rounded-2xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-[#0284c7]" />
+              <div className="cinematic-card p-8 rounded-3xl border border-[rgba(198,202,208,0.16)] bg-[#0B0B0E]/90 hover:border-[#C8102E]/50 shadow-xl space-y-4 h-full group transition-all">
+                <div className="w-12 h-12 rounded-2xl bg-[#8B0015]/20 border border-[#C8102E]/30 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Clock className="w-6 h-6 text-[#FF1744]" />
                 </div>
-                <h3 className="text-xl font-serif font-bold text-[#0B1220]">Rapid Response SLA</h3>
-                <p className="text-[#334155] text-sm leading-relaxed">
+                <h3 className="text-xl font-display font-bold text-white">Rapid Response SLA</h3>
+                <p className="text-[#A6A9B0] text-sm leading-relaxed">
                   Guaranteed emergency response within 15–30 minutes for mission-critical production outages.
                 </p>
-                <div className="text-xs font-mono font-bold text-[#0284c7]">P1 Critical Outage Support</div>
+                <div className="text-xs font-mono font-bold text-[#FF1744]">P1 Critical Outage Support</div>
               </div>
             </GridStaggerItem>
 
             <GridStaggerItem index={1}>
-              <div className="luxury-card p-8 rounded-3xl border border-[#BEE0FF] bg-white shadow-md space-y-4 h-full">
-                <div className="w-12 h-12 rounded-2xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center">
-                  <Server className="w-6 h-6 text-[#0284c7]" />
+              <div className="cinematic-card p-8 rounded-3xl border border-[rgba(198,202,208,0.16)] bg-[#0B0B0E]/90 hover:border-[#C8102E]/50 shadow-xl space-y-4 h-full group transition-all">
+                <div className="w-12 h-12 rounded-2xl bg-[#8B0015]/20 border border-[#C8102E]/30 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Server className="w-6 h-6 text-[#FF1744]" />
                 </div>
-                <h3 className="text-xl font-serif font-bold text-[#0B1220]">Cloud Health & Backups</h3>
-                <p className="text-[#334155] text-sm leading-relaxed">
+                <h3 className="text-xl font-display font-bold text-white">Cloud Health & Backups</h3>
+                <p className="text-[#A6A9B0] text-sm leading-relaxed">
                   Automated daily database backups, SSL renewals, Docker container health checks, and server autoscaling.
                 </p>
-                <div className="text-xs font-mono font-bold text-[#0284c7]">Automated Daily Snapshots</div>
+                <div className="text-xs font-mono font-bold text-[#FF1744]">Automated Daily Snapshots</div>
               </div>
             </GridStaggerItem>
 
             <GridStaggerItem index={2}>
-              <div className="luxury-card p-8 rounded-3xl border border-[#BEE0FF] bg-white shadow-md space-y-4 h-full">
-                <div className="w-12 h-12 rounded-2xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center">
-                  <Lock className="w-6 h-6 text-[#0284c7]" />
+              <div className="cinematic-card p-8 rounded-3xl border border-[rgba(198,202,208,0.16)] bg-[#0B0B0E]/90 hover:border-[#C8102E]/50 shadow-xl space-y-4 h-full group transition-all">
+                <div className="w-12 h-12 rounded-2xl bg-[#8B0015]/20 border border-[#C8102E]/30 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Lock className="w-6 h-6 text-[#FF1744]" />
                 </div>
-                <h3 className="text-xl font-serif font-bold text-[#0B1220]">Security & Vulnerability Patches</h3>
-                <p className="text-[#334155] text-sm leading-relaxed">
+                <h3 className="text-xl font-display font-bold text-white">Security & Vulnerability Patches</h3>
+                <p className="text-[#A6A9B0] text-sm leading-relaxed">
                   Continuous vulnerability scanning, dependency security updates, and firewall configuration.
                 </p>
-                <div className="text-xs font-mono font-bold text-[#0284c7]">Zero-Trust Hardening</div>
+                <div className="text-xs font-mono font-bold text-[#FF1744]">Zero-Trust Hardening</div>
               </div>
             </GridStaggerItem>
 
           </div>
 
           {/* SLA Packages Table */}
-          <SectionWrapper className="luxury-card p-8 sm:p-12 rounded-3xl border border-[#BEE0FF] space-y-6 bg-white shadow-xl">
-            <h2 className="text-2xl font-serif font-bold text-[#0B1220] text-center">
+          <SectionWrapper className="cinematic-card p-8 sm:p-12 rounded-3xl border border-[rgba(198,202,208,0.16)] space-y-6 bg-[#0B0B0E]/90 shadow-2xl relative overflow-hidden">
+            <h2 className="text-2xl font-display font-bold text-white text-center">
               Maintenance & SLA Tiers
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
               
-              <div className="p-6 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF] space-y-4">
-                <div className="text-xs font-bold text-[#0B1220] uppercase tracking-wider">Basic Health</div>
-                <div className="text-2xl font-serif font-extrabold text-[#0B1220]">Essential</div>
-                <ul className="space-y-2 text-xs text-[#334155]">
+              <div className="p-6 rounded-2xl bg-[#111115] border border-[rgba(198,202,208,0.1)] space-y-4">
+                <div className="text-xs font-bold text-[#C6CAD0] uppercase tracking-wider font-mono">Basic Health</div>
+                <div className="text-2xl font-display font-extrabold text-white">Essential</div>
+                <ul className="space-y-2 text-xs text-[#A6A9B0]">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <CheckCircle className="w-4 h-4 text-[#FF1744]" />
                     <span>Monthly Security Patches</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <CheckCircle className="w-4 h-4 text-[#FF1744]" />
                     <span>Weekly Data Backups</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <CheckCircle className="w-4 h-4 text-[#FF1744]" />
                     <span>Business Hours Support</span>
                   </li>
                 </ul>
               </div>
 
-              <div className="p-6 rounded-2xl bg-[#D6EBFF] border border-[#BEE0FF] space-y-4 relative shadow-md">
-                <div className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full bg-[#0B1220] text-[10px] font-bold text-white uppercase tracking-wider">
+              <div className="p-6 rounded-2xl bg-[#150a0e] border border-[#C8102E]/50 space-y-4 relative shadow-lg shadow-[#C8102E]/10">
+                <div className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full btn-ruby text-[10px] font-bold text-white uppercase tracking-wider shadow-md">
                   POPULAR
                 </div>
-                <div className="text-xs font-bold text-[#0B1220] uppercase tracking-wider">Standard Growth</div>
-                <div className="text-2xl font-serif font-extrabold text-[#0B1220]">Pro SLA</div>
-                <ul className="space-y-2 text-xs text-[#0B1220] font-medium">
+                <div className="text-xs font-bold text-[#FF1744] uppercase tracking-wider font-mono">Standard Growth</div>
+                <div className="text-2xl font-display font-extrabold text-white">Pro SLA</div>
+                <ul className="space-y-2 text-xs text-[#E8EBEF] font-medium">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <CheckCircle className="w-4 h-4 text-[#FF1744]" />
                     <span>24-Hour Ticket Response</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <CheckCircle className="w-4 h-4 text-[#FF1744]" />
                     <span>Daily Automated Cloud Backups</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <CheckCircle className="w-4 h-4 text-[#FF1744]" />
                     <span>AI Model API Monitoring</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <CheckCircle className="w-4 h-4 text-[#FF1744]" />
                     <span>10 Hours Minor Updates Included</span>
                   </li>
                 </ul>
               </div>
 
-              <div className="p-6 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF] space-y-4">
-                <div className="text-xs font-bold text-[#0B1220] uppercase tracking-wider">Enterprise Scale</div>
-                <div className="text-2xl font-serif font-extrabold text-[#0B1220]">Custom Retainer</div>
-                <ul className="space-y-2 text-xs text-[#334155]">
+              <div className="p-6 rounded-2xl bg-[#111115] border border-[rgba(198,202,208,0.1)] space-y-4">
+                <div className="text-xs font-bold text-[#C6CAD0] uppercase tracking-wider font-mono">Enterprise Scale</div>
+                <div className="text-2xl font-display font-extrabold text-white">Custom Retainer</div>
+                <ul className="space-y-2 text-xs text-[#A6A9B0]">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <CheckCircle className="w-4 h-4 text-[#FF1744]" />
                     <span>15-min Emergency Response</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <CheckCircle className="w-4 h-4 text-[#FF1744]" />
                     <span>Dedicated DevOps Engineer</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <CheckCircle className="w-4 h-4 text-[#FF1744]" />
                     <span>Multi-Region Cloud Failover</span>
                   </li>
                 </ul>
@@ -155,10 +155,10 @@ export default function SupportPage() {
 
             </div>
 
-            <div className="pt-6 border-t border-[#BEE0FF] text-center flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="pt-6 border-t border-[rgba(198,202,208,0.1)] text-center flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
                 href={`tel:${COMPANY_INFO.phone}`}
-                className="px-6 py-3 rounded-full font-bold text-xs bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-md flex items-center gap-2"
+                className="btn-ruby px-6 py-3 rounded-full font-display font-bold text-xs uppercase tracking-wider text-white shadow-lg shadow-[#C8102E]/25 flex items-center gap-2"
               >
                 <PhoneCall className="w-4 h-4" />
                 <span>Call Support Line: {COMPANY_INFO.phone}</span>
@@ -166,7 +166,7 @@ export default function SupportPage() {
 
               <Link
                 href="/contact"
-                className="px-6 py-3 rounded-full font-semibold text-xs text-[#0B1220] bg-[#F2F9FF] border border-[#BEE0FF] hover:bg-[#D6EBFF] flex items-center gap-2"
+                className="px-6 py-3 rounded-full font-semibold text-xs text-[#C6CAD0] bg-[#111115] border border-[rgba(198,202,208,0.16)] hover:bg-[#1a1a22] hover:text-white flex items-center gap-2 transition-all"
               >
                 <span>Submit Support Ticket</span>
                 <ArrowRight className="w-4 h-4" />

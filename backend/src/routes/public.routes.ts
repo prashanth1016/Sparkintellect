@@ -39,6 +39,18 @@ router.get("/case-studies/:slug", asyncHandler(PublicController.getCaseStudyBySl
 // Careers
 router.get("/careers", asyncHandler(PublicController.getCareers));
 router.get("/careers/:slug", asyncHandler(PublicController.getCareerBySlug));
+router.post(
+  "/careers/apply",
+  applyRateLimiter,
+  resumeUpload.single("resume"),
+  asyncHandler(PublicController.applyCareer)
+);
+router.post(
+  "/careers/:id/apply",
+  applyRateLimiter,
+  resumeUpload.single("resume"),
+  asyncHandler(PublicController.applyCareer)
+);
 
 // FAQs & Announcements & Settings
 router.get("/faqs", asyncHandler(PublicController.getFAQs));

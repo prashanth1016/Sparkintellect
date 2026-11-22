@@ -9,16 +9,16 @@ import { CTASection } from "@/components/home/CTASection";
 
 export const metadata: Metadata = {
   title: "Engineering Process & Roadmap | SparkIntellect",
-  description: "Learn about SparkIntellect's 9-step agile engineering roadmap from requirement discovery to zero-downtime cloud deployment.",
+  description: "Learn about SparkIntellect's 7-step agile engineering roadmap from requirement discovery to zero-downtime cloud deployment.",
 };
 
 export default function ProcessPage() {
   return (
-    <div className="relative min-h-screen bg-white text-[#0B1220] selection:bg-[#9FCFFB] selection:text-[#0B1220]">
+    <div className="relative min-h-screen w-full max-w-full overflow-x-hidden bg-[#EEEAF8] text-[#2B2A6B] selection:bg-[#2B2A6B] selection:text-[#EEEAF8]">
       <BackgroundGrid />
       <Navbar />
 
-      <main className="relative z-10 pt-20">
+      <main className="relative z-10 pt-28 w-full max-w-full overflow-x-hidden">
         <ProcessSection />
         <CTASection />
       </main>

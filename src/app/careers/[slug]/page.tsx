@@ -6,6 +6,7 @@ import { BackgroundGrid } from "@/components/ui/BackgroundGrid";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 import { FloatingCTA } from "@/components/ui/FloatingCTA";
+import { ApplyButtonModalTrigger } from "@/components/careers/ApplyButtonModalTrigger";
 import { publicApi, CareerItem } from "@/lib/api";
 import { COMPANY_INFO } from "@/data/companyData";
 import { 
@@ -14,15 +15,14 @@ import {
   CheckCircle2, 
   ArrowRight, 
   Sparkles, 
-  Send,
-  Award,
-  IndianRupee,
-  GraduationCap,
-  Building,
-  Mail,
-  FileText,
-  PhoneCall,
-  Check
+  Award, 
+  IndianRupee, 
+  GraduationCap, 
+  Building, 
+  Mail, 
+  FileText, 
+  PhoneCall, 
+  Check 
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -31,8 +31,6 @@ export const dynamicParams = true;
 interface Props {
   params: Promise<{ slug: string }> | { slug: string };
 }
-
-
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await Promise.resolve(params);
@@ -48,13 +46,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${career.title} | SparkIntellect Careers`,
-    description: career.shortDesc?.slice(0, 160) || `Apply for the ${career.title} position at SparkIntellect in Guindy, Chennai.`,
+    description: career.shortDesc?.slice(0, 160) || `Apply for the ${career.title} position at SparkIntellect in Chennai.`,
   };
 }
 
-/**
- * Helper to parse structured sections from markdown job descriptions
- */
 interface ParsedJobDescription {
   overviewParagraphs: string[];
   responsibilities: string[];
@@ -87,19 +82,16 @@ function parseJobDescription(text: string = ""): ParsedJobDescription {
     const line = rawLine.trim();
     if (!line) continue;
 
-    // Detect salary mention
     const salaryMatch = line.match(/(?:Salary|Annual CTC|Compensation)\s*:\s*(₹?[0-9.]+\s*LPA)/i);
     if (salaryMatch && !result.detectedSalary) {
       result.detectedSalary = salaryMatch[1];
     }
 
-    // Detect experience mention
     const expMatch = line.match(/(?:Experience)\s*:\s*([^,\n]+)/i);
     if (expMatch && !result.detectedExperience) {
       result.detectedExperience = expMatch[1].trim();
     }
 
-    // Section headings detection
     if (/^(?:###?\s*|\*\*\s*)?(Key Responsibilities|Responsibilities)\s*:?\*?\*?$/i.test(line)) {
       currentSection = "responsibilities";
     } else if (/^(?:###?\s*|\*\*\s*)?(Required Skills|Qualifications & Skills|Skills Required)\s*:?\*?\*?$/i.test(line)) {
@@ -115,10 +107,7 @@ function parseJobDescription(text: string = ""): ParsedJobDescription {
     } else if (/^(?:###?\s*|\*\*\s*)?(Job Overview|Overview|About SparkIntellect)\s*:?\*?\*?$/i.test(line)) {
       currentSection = "overview";
     } else {
-      // Clean bullet points
       const cleanBullet = line.replace(/^[-*•]\s*/, "");
-      
-      // Skip meta headers like "Job Title: Data Analyst", "Company: SparkIntellect" inside body
       if (/^(?:Job Description:|Company:|Job Title:|Employment Type:|Job Level:)/i.test(line)) {
         continue;
       }
@@ -174,10 +163,8 @@ export default async function CareerDetailPage({ params }: Props) {
     notFound();
   }
 
-  // Parse structured data from stored description
   const parsed = parseJobDescription(career.description);
 
-  // Fallbacks from DB fields if not found in parsed sections
   const displayResponsibilities = parsed.responsibilities.length > 0 
     ? parsed.responsibilities 
     : (career.responsibilities || []);
@@ -190,139 +177,117 @@ export default async function CareerDetailPage({ params }: Props) {
     ? parsed.benefits
     : (career.benefits || []);
 
-  // Department display
   const departmentLabel = career.slug === "dna" 
     ? "Data Analytics / Engineering" 
     : career.department || "Engineering";
 
-  // Experience display
   const experienceLabel = parsed.detectedExperience || career.experience || "Fresher to 2 Years";
-
-  // Salary display
   const salaryLabel = parsed.detectedSalary || "₹3.2 LPA";
 
-  // Work arrangement
   const isHybrid = /hybrid/i.test(career.location || "");
-  const baseLocation = career.location?.replace(/\s*\(Hybrid\)/i, "").trim() || "Guindy, Chennai";
+  const baseLocation = career.location?.replace(/Guindy,?\s*/i, "").replace(/\s*\(Hybrid\)/i, "").trim() || "Chennai, India";
 
-  // Key required tech tags (especially for Data Analyst role)
   const techPills = career.slug === "dna" 
     ? ["Microsoft Excel", "SQL", "Power BI", "Data Modeling", "Business Analytics"]
     : ["TypeScript", "Python", "SQL", "Cloud Architecture"];
 
-  // Email apply subject & body
-  const applySubject = `Application for ${career.title} (Ref: ${career.slug.toUpperCase()}) - SparkIntellect`;
-  const applyBody = `Hi SparkIntellect Recruitment Team,%0D%0A%0D%0AI would like to apply for the position of ${encodeURIComponent(career.title)} (${encodeURIComponent(departmentLabel)}) in ${encodeURIComponent(baseLocation)}.%0D%0A%0D%0AMy Details:%0D%0A- Full Name:%0D%0A- Mobile Number:%0D%0A- Current Location:%0D%0A- Relevant Experience / Graduation Year:%0D%0A- Key Skills (Excel, SQL, Power BI):%0D%0A- LinkedIn / Portfolio / GitHub Link:%0D%0A%0D%0APlease find my resume attached for your consideration.%0D%0A%0D%0AThank you,%0D%0A`;
-
   return (
-    <div className="relative min-h-screen bg-white text-[#0B1220] selection:bg-[#9FCFFB] selection:text-[#0B1220]">
+    <div className="relative min-h-screen bg-[#EEEAF8] text-[#2B2A6B] selection:bg-[#2B2A6B] selection:text-[#EEEAF8]">
       <BackgroundGrid />
       <Navbar />
 
-      <main className="relative z-10 pt-32 pb-24">
+      <main className="relative z-10 pt-36 pb-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Breadcrumb */}
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-mono text-[#334155] mb-8">
-            <Link href="/" className="hover:text-[#0B1220] transition-colors">Home</Link>
-            <span className="text-slate-400">/</span>
-            <Link href="/careers" className="hover:text-[#0B1220] transition-colors">Careers</Link>
-            <span className="text-slate-400">/</span>
-            <span className="text-[#0284c7] font-semibold">{career.title}</span>
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-mono text-[#2B2A6B]/70 mb-8">
+            <Link href="/" className="hover:text-[#2B2A6B] transition-colors">Home</Link>
+            <span className="text-[#2B2A6B]/30">/</span>
+            <Link href="/careers" className="hover:text-[#2B2A6B] transition-colors">Careers</Link>
+            <span className="text-[#2B2A6B]/30">/</span>
+            <span className="text-[#2B2A6B] font-semibold">{career.title}</span>
           </nav>
 
           {/* Hero Spotlight Card */}
-          <div className="luxury-card p-8 sm:p-12 rounded-3xl border border-[#BEE0FF] bg-gradient-to-br from-white via-[#F2F9FF] to-white shadow-xl mb-10 space-y-6">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="px-3.5 py-1 rounded-full bg-[#D6EBFF] text-[#0284c7] font-mono font-bold text-xs uppercase tracking-wide">
+          <div className="glass-panel p-8 sm:p-12 rounded-3xl border border-[#EEEAF8]/25 bg-[#2B2A6B]/95 text-[#EEEAF8] shadow-2xl mb-10 space-y-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-[#d4a373]/15 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex flex-wrap items-center gap-3 relative z-10">
+              <span className="px-3.5 py-1 rounded-full bg-[#1E1D4E] border border-[#EEEAF8]/20 text-[#EEEAF8] font-mono font-bold text-xs uppercase tracking-wide">
                 {departmentLabel}
               </span>
-              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono font-semibold text-xs flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="px-3 py-1 rounded-full bg-[#1E1D4E] text-[#d4a373] border border-[#EEEAF8]/20 font-mono font-semibold text-xs flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#d4a373] animate-pulse" />
                 <span>Actively Hiring</span>
               </span>
-              <span className="text-xs font-mono text-[#334155]">
-                Role Code: <strong className="text-[#0B1220]">{career.slug.toUpperCase()}</strong>
+              <span className="text-xs font-mono text-[#EEEAF8]/70">
+                Role Code: <strong className="text-white">{career.slug.toUpperCase()}</strong>
               </span>
             </div>
 
-            <div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#0B1220] leading-tight mb-3">
+            <div className="relative z-10">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-[#EEEAF8] leading-tight mb-3">
                 {career.title}
               </h1>
-              <p className="text-base sm:text-lg text-[#334155] leading-relaxed">
-                Join our engineering team in Guindy, Chennai to build intelligent data pipelines, automated dashboards, and actionable analytics systems.
+              <p className="text-base sm:text-lg text-[#EEEAF8]/85 leading-relaxed">
+                Join our engineering team in Chennai to build intelligent software platforms and actionable analytics systems.
               </p>
             </div>
 
             {/* Quick Specs Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-[#BEE0FF]">
-              <div className="p-3.5 rounded-2xl bg-white border border-[#BEE0FF] shadow-sm">
-                <div className="text-[10px] font-mono uppercase text-[#334155] flex items-center gap-1">
-                  <IndianRupee className="w-3 h-3 text-[#0284c7]" />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-[#EEEAF8]/15 relative z-10">
+              <div className="p-3.5 rounded-2xl bg-[#1E1D4E] border border-[#EEEAF8]/20">
+                <div className="text-[10px] font-mono uppercase text-[#EEEAF8]/70 flex items-center gap-1">
+                  <IndianRupee className="w-3 h-3 text-[#d4a373]" />
                   <span>Salary (CTC)</span>
                 </div>
-                <div className="text-sm font-bold text-[#0284c7] mt-0.5">{salaryLabel}</div>
+                <div className="text-sm font-bold text-[#d4a373] mt-0.5">{salaryLabel}</div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-white border border-[#BEE0FF] shadow-sm">
-                <div className="text-[10px] font-mono uppercase text-[#334155] flex items-center gap-1">
-                  <GraduationCap className="w-3 h-3 text-[#0284c7]" />
+              <div className="p-3.5 rounded-2xl bg-[#1E1D4E] border border-[#EEEAF8]/20">
+                <div className="text-[10px] font-mono uppercase text-[#EEEAF8]/70 flex items-center gap-1">
+                  <GraduationCap className="w-3 h-3 text-[#d4a373]" />
                   <span>Experience</span>
                 </div>
-                <div className="text-sm font-bold text-[#0B1220] mt-0.5">{experienceLabel}</div>
+                <div className="text-sm font-bold text-[#EEEAF8] mt-0.5">{experienceLabel}</div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-white border border-[#BEE0FF] shadow-sm">
-                <div className="text-[10px] font-mono uppercase text-[#334155] flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-[#0284c7]" />
+              <div className="p-3.5 rounded-2xl bg-[#1E1D4E] border border-[#EEEAF8]/20">
+                <div className="text-[10px] font-mono uppercase text-[#EEEAF8]/70 flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-[#d4a373]" />
                   <span>Location</span>
                 </div>
-                <div className="text-sm font-bold text-[#0B1220] mt-0.5">{baseLocation}</div>
+                <div className="text-sm font-bold text-[#EEEAF8] mt-0.5">{baseLocation}</div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-white border border-[#BEE0FF] shadow-sm">
-                <div className="text-[10px] font-mono uppercase text-[#334155] flex items-center gap-1">
-                  <Building className="w-3 h-3 text-[#0284c7]" />
+              <div className="p-3.5 rounded-2xl bg-[#1E1D4E] border border-[#EEEAF8]/20">
+                <div className="text-[10px] font-mono uppercase text-[#EEEAF8]/70 flex items-center gap-1">
+                  <Building className="w-3 h-3 text-[#d4a373]" />
                   <span>Work Mode</span>
                 </div>
-                <div className="text-sm font-bold text-[#0B1220] mt-0.5">
+                <div className="text-sm font-bold text-[#EEEAF8] mt-0.5">
                   {career.type} {isHybrid ? "• Hybrid" : ""}
                 </div>
               </div>
             </div>
 
-            {/* Top Primary Action Buttons */}
-            <div className="pt-2 flex flex-col sm:flex-row gap-4">
-              <a
-                href={`mailto:${COMPANY_INFO.careersEmail}?subject=${encodeURIComponent(applySubject)}&body=${applyBody}`}
-                className="px-8 py-4 rounded-full font-bold text-sm bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-lg shadow-[#9FCFFB]/40 transition-all flex items-center justify-center gap-2 group"
-              >
-                <Send className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                <span>Apply for this Role via Email</span>
-              </a>
-
-              <a
-                href={`tel:${COMPANY_INFO.phone}`}
-                className="px-8 py-4 rounded-full font-semibold text-sm bg-white text-[#0B1220] border border-[#BEE0FF] hover:bg-[#D6EBFF] transition-all flex items-center justify-center gap-2 text-center"
-              >
-                <PhoneCall className="w-4 h-4 text-[#0284c7]" />
-                <span>Call Recruitment Desk</span>
-              </a>
+            {/* Apply Action */}
+            <div className="pt-2 flex flex-col sm:flex-row gap-4 relative z-10">
+              <ApplyButtonModalTrigger career={career} />
             </div>
           </div>
 
           {/* Core Tools & Competencies */}
-          <div className="luxury-card p-6 rounded-3xl border border-[#BEE0FF] bg-white shadow-sm mb-8 space-y-3">
-            <div className="text-xs font-mono font-bold uppercase text-[#0B1220] flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#0284c7]" />
+          <div className="glass-card p-6 rounded-3xl border border-[#EEEAF8]/20 bg-[#2B2A6B]/95 text-[#EEEAF8] shadow-sm mb-8 space-y-3">
+            <div className="text-xs font-mono font-bold uppercase text-[#EEEAF8]/80 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#d4a373]" />
               <span>Core Tools & Core Competencies:</span>
             </div>
             <div className="flex flex-wrap gap-2 pt-1">
               {techPills.map((tech) => (
                 <span
                   key={tech}
-                  className="px-3.5 py-1.5 rounded-xl bg-[#F2F9FF] border border-[#BEE0FF] text-xs font-mono font-semibold text-[#0B1220]"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#1E1D4E] border border-[#EEEAF8]/20 text-xs font-mono font-semibold text-[#EEEAF8]"
                 >
                   {tech}
                 </span>
@@ -330,39 +295,22 @@ export default async function CareerDetailPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Overview & About Company */}
-          <div className="luxury-card p-8 sm:p-10 rounded-3xl border border-[#BEE0FF] bg-white shadow-sm space-y-6 mb-8">
-            <h2 className="text-2xl font-serif font-bold text-[#0B1220]">
-              About the Position
-            </h2>
-            
-            <div className="space-y-4 text-sm text-[#334155] leading-relaxed">
-              {parsed.overviewParagraphs.length > 0 ? (
-                parsed.overviewParagraphs.map((para, idx) => (
-                  <p key={idx}>{para}</p>
-                ))
-              ) : (
-                <p>{career.shortDesc || career.description}</p>
-              )}
-            </div>
-          </div>
-
           {/* Key Responsibilities */}
           {displayResponsibilities.length > 0 && (
-            <div className="p-8 sm:p-10 rounded-3xl bg-white border border-[#BEE0FF] shadow-sm space-y-5 mb-8">
+            <div className="glass-card p-8 sm:p-10 rounded-3xl bg-[#2B2A6B]/95 text-[#EEEAF8] border border-[#EEEAF8]/20 shadow-sm space-y-5 mb-8">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#D6EBFF] text-[#0284c7] flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-xl bg-[#1E1D4E] border border-[#EEEAF8]/20 text-[#d4a373] flex items-center justify-center font-bold">
                   <Briefcase className="w-4 h-4" />
                 </div>
-                <h2 className="text-2xl font-serif font-bold text-[#0B1220]">
+                <h2 className="text-2xl font-display font-bold text-[#EEEAF8]">
                   Key Responsibilities
                 </h2>
               </div>
 
               <div className="space-y-3.5 pt-2">
                 {displayResponsibilities.map((r, i) => (
-                  <div key={i} className="flex items-start gap-3 text-sm text-[#334155] leading-relaxed">
-                    <CheckCircle2 className="w-4 h-4 text-[#0284c7] shrink-0 mt-1" />
+                  <div key={i} className="flex items-start gap-3 text-sm text-[#EEEAF8]/85 leading-relaxed">
+                    <CheckCircle2 className="w-4 h-4 text-[#d4a373] shrink-0 mt-1" />
                     <span>{r}</span>
                   </div>
                 ))}
@@ -372,20 +320,20 @@ export default async function CareerDetailPage({ params }: Props) {
 
           {/* Qualifications & Required Skills */}
           {displaySkills.length > 0 && (
-            <div className="p-8 sm:p-10 rounded-3xl bg-white border border-[#BEE0FF] shadow-sm space-y-5 mb-8">
+            <div className="glass-card p-8 sm:p-10 rounded-3xl bg-[#2B2A6B]/95 text-[#EEEAF8] border border-[#EEEAF8]/20 shadow-sm space-y-5 mb-8">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#D6EBFF] text-[#0284c7] flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-xl bg-[#1E1D4E] border border-[#EEEAF8]/20 text-[#d4a373] flex items-center justify-center font-bold">
                   <Sparkles className="w-4 h-4" />
                 </div>
-                <h2 className="text-2xl font-serif font-bold text-[#0B1220]">
+                <h2 className="text-2xl font-display font-bold text-[#EEEAF8]">
                   Required Skills & Qualifications
                 </h2>
               </div>
 
               <div className="space-y-3.5 pt-2">
                 {displaySkills.map((req, i) => (
-                  <div key={i} className="flex items-start gap-3 text-sm text-[#334155] leading-relaxed">
-                    <CheckCircle2 className="w-4 h-4 text-[#0284c7] shrink-0 mt-1" />
+                  <div key={i} className="flex items-start gap-3 text-sm text-[#EEEAF8]/85 leading-relaxed">
+                    <CheckCircle2 className="w-4 h-4 text-[#d4a373] shrink-0 mt-1" />
                     <span>{req}</span>
                   </div>
                 ))}
@@ -393,37 +341,14 @@ export default async function CareerDetailPage({ params }: Props) {
             </div>
           )}
 
-          {/* Eligibility Criteria (if available) */}
-          {parsed.eligibility.length > 0 && (
-            <div className="p-8 sm:p-10 rounded-3xl bg-[#F2F9FF] border border-[#BEE0FF] shadow-sm space-y-5 mb-8">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-white border border-[#BEE0FF] text-[#0284c7] flex items-center justify-center font-bold">
-                  <GraduationCap className="w-4 h-4" />
-                </div>
-                <h2 className="text-2xl font-serif font-bold text-[#0B1220]">
-                  Eligibility Criteria
-                </h2>
-              </div>
-
-              <div className="space-y-3 pt-2">
-                {parsed.eligibility.map((crit, i) => (
-                  <div key={i} className="flex items-start gap-3 text-sm text-[#334155] leading-relaxed">
-                    <Check className="w-4 h-4 text-[#0284c7] shrink-0 mt-1" />
-                    <span>{crit}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Salary, Benefits & Growth */}
+          {/* Benefits */}
           {displayBenefits.length > 0 && (
-            <div className="p-8 sm:p-10 rounded-3xl bg-white border border-[#BEE0FF] shadow-sm space-y-5 mb-8">
+            <div className="glass-card p-8 sm:p-10 rounded-3xl bg-[#2B2A6B]/95 text-[#EEEAF8] border border-[#EEEAF8]/20 shadow-sm space-y-5 mb-8">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#D6EBFF] text-[#0284c7] flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-xl bg-[#1E1D4E] border border-[#EEEAF8]/20 text-[#d4a373] flex items-center justify-center font-bold">
                   <Award className="w-4 h-4" />
                 </div>
-                <h2 className="text-2xl font-serif font-bold text-[#0B1220]">
+                <h2 className="text-2xl font-display font-bold text-[#EEEAF8]">
                   Compensation & What We Offer
                 </h2>
               </div>
@@ -432,9 +357,9 @@ export default async function CareerDetailPage({ params }: Props) {
                 {displayBenefits.map((b, i) => (
                   <div
                     key={i}
-                    className="p-4 rounded-2xl bg-[#F2F9FF] border border-[#BEE0FF] text-xs sm:text-sm text-[#0B1220] flex items-start gap-2.5 font-medium"
+                    className="p-4 rounded-2xl bg-[#1E1D4E] border border-[#EEEAF8]/15 text-xs sm:text-sm text-[#EEEAF8]/85 flex items-start gap-2.5 font-medium"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-[#0284c7] shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-[#d4a373] shrink-0 mt-0.5" />
                     <span>{b}</span>
                   </div>
                 ))}
@@ -442,61 +367,30 @@ export default async function CareerDetailPage({ params }: Props) {
             </div>
           )}
 
-          {/* How to Apply & Guidelines */}
-          {parsed.howToApply.length > 0 && (
-            <div className="p-7 rounded-3xl bg-white border border-[#BEE0FF] shadow-sm space-y-3 mb-10">
-              <div className="text-xs font-mono font-bold uppercase text-[#0B1220] flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#0284c7]" />
-                <span>Application Instructions:</span>
-              </div>
-              <div className="space-y-2 text-xs sm:text-sm text-[#334155] leading-relaxed">
-                {parsed.howToApply.map((ins, i) => (
-                  <p key={i}>{ins}</p>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Apply CTA Card */}
-          <div className="luxury-card p-10 sm:p-12 rounded-3xl border border-[#BEE0FF] bg-gradient-to-br from-[#D6EBFF] via-[#BEE0FF] to-[#9FCFFB] text-center shadow-xl space-y-6">
-            <div className="max-w-xl mx-auto space-y-2">
-              <span className="px-3.5 py-1 rounded-full bg-white/80 text-[#0B1220] font-mono text-xs font-bold uppercase tracking-wide">
-                Direct Hiring Channel
+          <div className="glass-panel p-10 sm:p-12 rounded-3xl border border-[#EEEAF8]/25 bg-[#2B2A6B]/95 text-[#EEEAF8] text-center shadow-2xl space-y-6 relative overflow-hidden">
+            <div className="max-w-xl mx-auto space-y-2 relative z-10">
+              <span className="px-3.5 py-1 rounded-full bg-[#1E1D4E] text-[#d4a373] border border-[#EEEAF8]/20 font-mono text-xs font-bold uppercase tracking-wide">
+                Candidate Pipeline
               </span>
-              <h3 className="text-3xl sm:text-4xl font-serif font-bold text-[#0B1220]">
+              <h3 className="text-3xl sm:text-4xl font-display font-bold text-[#EEEAF8]">
                 Apply for {career.title}
               </h3>
-              <p className="text-xs sm:text-sm text-[#0B1220]/80 leading-relaxed">
-                Send your updated resume along with any GitHub repositories, Power BI dashboards, or project portfolios directly to our technical talent team in Chennai.
+              <p className="text-xs sm:text-sm text-[#EEEAF8]/80 leading-relaxed">
+                Submit your candidate information and resume through our secure multi-step portal.
               </p>
             </div>
 
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
-                href={`mailto:${COMPANY_INFO.careersEmail}?subject=${encodeURIComponent(applySubject)}&body=${applyBody}`}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-bold text-sm bg-[#0B1220] text-white hover:bg-slate-800 shadow-xl transition-all transform hover:-translate-y-0.5"
-              >
-                <Mail className="w-4 h-4" />
-                <span>Send Application Email</span>
-              </a>
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
+              <ApplyButtonModalTrigger career={career} />
 
               <Link
                 href="/careers"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full font-semibold text-xs bg-white text-[#0B1220] border border-[#BEE0FF] hover:bg-[#D6EBFF] transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full font-semibold text-xs glass-btn-secondary"
               >
                 <span>Browse Other Positions</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
-            </div>
-
-            <div className="text-xs text-[#0B1220]/70 pt-2">
-              Official Recruitment Email:{" "}
-              <a
-                href={`mailto:${COMPANY_INFO.careersEmail}`}
-                className="font-bold underline text-[#0B1220] hover:text-[#0284c7]"
-              >
-                {COMPANY_INFO.careersEmail}
-              </a>
             </div>
           </div>
 

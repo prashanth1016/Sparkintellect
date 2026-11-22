@@ -65,7 +65,7 @@ const InternshipSchema = new Schema<IInternship>(
     duration: { type: String, default: "3 Months" },
     mode: { type: String, default: "Hybrid (Chennai / Remote)" },
     stipend: { type: String, default: "Performance-Based / Competitive" },
-    location: { type: String, default: "Guindy Tech Corridor, Chennai" },
+    location: { type: String, default: "Chennai" },
     eligibility: { type: String, default: "B.E / B.Tech / MCA / BCA / M.Sc Students & Fresh Graduates" },
     skills: { type: [String], default: [] },
     technologies: { type: [String], default: [] },

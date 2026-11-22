@@ -22,7 +22,7 @@ const CareerSchema = new Schema<ICareer>(
     title: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
     department: { type: String, default: "Engineering" },
-    location: { type: String, default: "Guindy, Chennai (Hybrid)" },
+    location: { type: String, default: "Chennai (Hybrid)" },
     type: { type: String, default: "Full-Time" },
     experience: { type: String, default: "2–4 Years" },
     shortDesc: { type: String, required: true },

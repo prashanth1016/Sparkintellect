@@ -9,8 +9,8 @@ export default function AdminSettingsPage() {
     siteName: "SparkIntellect",
     tagline: "AI • Software • Automation",
     contactEmail: "info@sparkintellect.in",
-    contactPhone: "+91 8977177634",
-    officeAddress: "Guindy Tech Corridor, Chennai, Tamil Nadu - 600032, India",
+    contactPhone: "+91 9943177634",
+    officeAddress: "Chennai, Tamil Nadu - 600032, India",
     workingHours: "Monday – Saturday: 9:00 AM – 7:00 PM IST",
     maintenanceMode: false,
     googleSheetsAutoSync: true,
@@ -59,7 +59,7 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      
+
       <div className="border-b border-[#BEE0FF] pb-6">
         <h1 className="text-2xl font-serif font-bold text-[#0B1220] flex items-center gap-2">
           <Settings className="w-6 h-6 text-[#0284c7]" />
@@ -85,7 +85,7 @@ export default function AdminSettingsPage() {
       )}
 
       <form onSubmit={handleSave} className="space-y-6">
-        
+
         {/* Company Identity */}
         <div className="luxury-card p-6 sm:p-8 rounded-3xl border border-[#BEE0FF] bg-white shadow-sm space-y-4">
           <h2 className="text-base font-serif font-bold text-[#0B1220] flex items-center gap-2">

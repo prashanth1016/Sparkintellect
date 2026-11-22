@@ -4,6 +4,7 @@ import { Application } from "../models/Application.js";
 import { Contact } from "../models/Contact.js";
 import { CaseStudy } from "../models/CaseStudy.js";
 import { Career } from "../models/Career.js";
+import { CareerApplication } from "../models/CareerApplication.js";
 import { FAQ } from "../models/FAQ.js";
 import { Announcement } from "../models/Announcement.js";
 import { WebsiteSettings } from "../models/WebsiteSettings.js";
@@ -366,6 +367,88 @@ export class PublicController {
       return;
     }
     res.json({ success: true, data: item });
+  }
+
+  static async applyCareer(req: Request, res: Response): Promise<void> {
+    const { careerId, careerSlug, careerTitle } = req.body;
+    let personalInfo: any = {};
+    let academicInfo: any = {};
+    let professionalInfo: any = {};
+
+    try {
+      personalInfo = typeof req.body.personalInfo === "string" ? JSON.parse(req.body.personalInfo) : (req.body.personalInfo || {});
+      academicInfo = typeof req.body.academicInfo === "string" ? JSON.parse(req.body.academicInfo) : (req.body.academicInfo || {});
+      professionalInfo = typeof req.body.professionalInfo === "string" ? JSON.parse(req.body.professionalInfo) : (req.body.professionalInfo || {});
+    } catch {
+      // ignore
+    }
+
+    if (!personalInfo.fullName && req.body.fullName) personalInfo.fullName = req.body.fullName;
+    if (!personalInfo.email && req.body.email) personalInfo.email = req.body.email;
+    if (!personalInfo.mobile && req.body.mobile) personalInfo.mobile = req.body.mobile;
+    if (!personalInfo.location && req.body.location) personalInfo.location = req.body.location;
+
+    if (!personalInfo.fullName || !personalInfo.email || !personalInfo.mobile) {
+      res.status(400).json({ success: false, error: "Personal information (Full Name, Email, Mobile) is required." });
+      return;
+    }
+
+    const applicationReferenceId = await ReferenceIdService.generateCareerApplicationReferenceId();
+
+    let resumeUrl: string | undefined;
+    let resumeFileName: string | undefined;
+    let resumeFileId: string | undefined;
+    let resumeStorageProvider: "google-drive" | "local" = "google-drive";
+    let resumeSize: number | undefined;
+    let resumeMimeType: string | undefined;
+
+    if (req.file && req.file.buffer) {
+      try {
+        const uploadResult = await GoogleDriveStorageService.uploadResume({
+          buffer: req.file.buffer,
+          originalFilename: req.file.originalname,
+          mimeType: req.file.mimetype,
+          candidateName: personalInfo.fullName,
+          applicationReferenceId,
+        });
+
+        resumeFileId = uploadResult.fileId;
+        resumeFileName = uploadResult.fileName;
+        resumeMimeType = uploadResult.mimeType;
+        resumeSize = uploadResult.size;
+        resumeStorageProvider = uploadResult.storageProvider;
+        resumeUrl = `/api/v1/admin/career-applications/${applicationReferenceId}/resume`;
+      } catch (uploadErr: any) {
+        console.error("❌ [PublicController] Career resume upload failed:", uploadErr.message);
+      }
+    }
+
+    const newApp = await CareerApplication.create({
+      applicationReferenceId,
+      careerId: careerId || "general",
+      careerSlug: careerSlug || "general",
+      careerTitle: careerTitle || professionalInfo.position || "Engineering Position",
+      personalInfo,
+      academicInfo,
+      professionalInfo,
+      resumeUrl,
+      resumeFileName,
+      resumeFileId,
+      resumeStorageProvider,
+      resumeSize,
+      resumeMimeType,
+      status: "new",
+      ipAddress: req.ip,
+      userAgent: req.get("User-Agent"),
+    });
+
+    res.status(201).json({
+      success: true,
+      data: {
+        applicationReferenceId: newApp.applicationReferenceId,
+        message: "Your application has been received and logged in our candidate pipeline.",
+      },
+    });
   }
 
   // FAQs & Announcements & Settings

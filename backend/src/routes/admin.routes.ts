@@ -135,6 +135,26 @@ router.delete(
   asyncHandler(AdminController.deleteCareer)
 );
 
+// Career Applications
+router.get("/career-applications", requirePermission("application.read"), asyncHandler(AdminController.getCareerApplications));
+router.put(
+  "/career-applications/:id/status",
+  requirePermission("application.update"),
+  logAuditEvent("career_application.status_update"),
+  asyncHandler(AdminController.updateCareerApplicationStatus)
+);
+router.delete(
+  "/career-applications/:id",
+  requirePermission("application.delete"),
+  logAuditEvent("career_application.delete"),
+  asyncHandler(AdminController.deleteCareerApplication)
+);
+router.get(
+  "/career-applications/:id/resume",
+  requirePermission("application.read"),
+  asyncHandler(AdminController.downloadCareerResume)
+);
+
 // Case Studies
 router.get("/case-studies", requirePermission("content.read"), asyncHandler(AdminController.getCaseStudies));
 router.post(

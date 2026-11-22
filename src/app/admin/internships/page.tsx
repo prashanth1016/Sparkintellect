@@ -3,17 +3,17 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { adminApi, InternshipItem } from "@/lib/api";
-import { 
-  GraduationCap, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Check, 
-  X, 
-  Sparkles, 
-  Layers, 
-  MoveUp, 
+import {
+  GraduationCap,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  Check,
+  X,
+  Sparkles,
+  Layers,
+  MoveUp,
   MoveDown,
   AlertCircle,
   CheckCircle2,
@@ -53,7 +53,7 @@ export default function AdminInternshipsPage() {
       duration: "3 Months",
       mode: "Hybrid (Chennai / Remote)",
       stipend: "Performance-Based / Competitive",
-      location: "Guindy Tech Corridor, Chennai",
+      location: "Chennai",
       eligibility: "B.E / B.Tech / MCA / BCA / M.Sc Students & Fresh Graduates",
       skills: ["React", "TypeScript", "Node.js", "AI Integration"],
       technologies: ["Next.js", "Python", "MongoDB", "Docker"],
@@ -151,7 +151,7 @@ export default function AdminInternshipsPage() {
 
   return (
     <div className="space-y-6">
-      
+
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#BEE0FF] pb-6">
         <div>
@@ -444,13 +444,12 @@ export default function AdminInternshipsPage() {
                       </span>
                     </td>
                     <td className="p-4">
-                      <span className={`px-2.5 py-1 rounded-full font-mono text-[10px] font-bold ${
-                        item.status === "open"
+                      <span className={`px-2.5 py-1 rounded-full font-mono text-[10px] font-bold ${item.status === "open"
                           ? "bg-emerald-100 text-emerald-800"
                           : item.status === "closed"
-                          ? "bg-rose-100 text-rose-800"
-                          : "bg-slate-100 text-slate-700"
-                      }`}>
+                            ? "bg-rose-100 text-rose-800"
+                            : "bg-slate-100 text-slate-700"
+                        }`}>
                         {item.status.toUpperCase()}
                       </span>
                     </td>

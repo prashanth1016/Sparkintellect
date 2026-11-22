@@ -302,7 +302,7 @@ export const EmailComposerModal: React.FC<EmailComposerModalProps> = ({
                         className="w-full px-3 py-2 rounded-xl bg-white border border-[#BEE0FF] text-xs text-[#0B1220]"
                       >
                         <option value="Online">Online (Google Meet / Zoom)</option>
-                        <option value="Offline">Offline (Guindy Office, Chennai)</option>
+                        <option value="Offline">Offline (Chennai HQ Office)</option>
                         <option value="Telephonic">Telephonic Screening</option>
                       </select>
                     </div>
@@ -472,11 +472,11 @@ export const EmailComposerModal: React.FC<EmailComposerModalProps> = ({
                   <div className="bg-[#0B1220] p-5 text-center border-b-2 border-[#0284c7]">
                     <div className="flex items-center justify-center gap-3">
                       <Image
-                        src="/logo.png"
+                        src="/images/sparkintellect-logo-v2.png"
                         alt="SparkIntellect"
-                        width={36}
-                        height={36}
-                        className="rounded-lg border border-[#9FCFFB]/40"
+                        width={160}
+                        height={32}
+                        className="h-8 w-auto object-contain"
                       />
                       <div className="text-left">
                         <div className="text-lg font-serif font-bold text-[#9FCFFB] leading-none">SparkIntellect</div>

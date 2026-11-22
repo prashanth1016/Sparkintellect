@@ -20,6 +20,40 @@ export type {
   FAQItem,
 };
 
+export interface CareerApplicationItem {
+  _id: string;
+  applicationReferenceId: string;
+  careerId: string;
+  careerSlug: string;
+  careerTitle: string;
+  personalInfo: {
+    fullName: string;
+    email: string;
+    mobile: string;
+    location: string;
+  };
+  academicInfo: {
+    highestQualification: string;
+    institution: string;
+    department: string;
+    graduationYear: string;
+  };
+  professionalInfo: {
+    position: string;
+    experienceLevel: string;
+    skills: string[];
+    portfolioUrl?: string;
+    linkedinUrl?: string;
+    githubUrl?: string;
+  };
+  resumeUrl?: string;
+  resumeFileName?: string;
+  resumeFileId?: string;
+  status: "new" | "under_review" | "shortlisted" | "interview_scheduled" | "selected" | "rejected";
+  notes?: string;
+  createdAt: string;
+}
+
 export interface ApplicationItem {
   _id: string;
   applicationReferenceId?: string;
@@ -202,6 +236,20 @@ export const publicApi = {
     return json;
   },
 
+  async submitCareerApplication(
+    formData: FormData
+  ): Promise<{ success: boolean; message: string; applicationReferenceId?: string }> {
+    const res = await fetch(`${API_BASE_URL}/api/public/careers/apply`, {
+      method: "POST",
+      body: formData,
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      throw new Error(json.error || json.message || "Failed to submit career application");
+    }
+    return json;
+  },
+
   async submitContact(data: {
     name: string;
     email: string;
@@ -281,6 +329,28 @@ export const publicApi = {
   },
 
   async getFaqs(): Promise<FAQItem[]> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/public/faqs`, {
+        next: { revalidate: 60 },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data && json.data.length > 0) {
+          return json.data.map((f: any) => ({
+            _id: f._id,
+            question: f.question || f.q,
+            answer: f.answer || f.a,
+            q: f.question || f.q,
+            a: f.answer || f.a,
+            category: f.category,
+            order: f.order,
+            published: f.published,
+          }));
+        }
+      }
+    } catch {
+      // Fallback to static data if backend is offline
+    }
     return FAQS.map((f) => ({
       question: f.q,
       answer: f.a,
@@ -674,6 +744,54 @@ export const adminApi = {
       credentials: "include",
     });
     return res.json();
+  },
+
+  // Career Applications
+  async getCareerApplications(params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+  }): Promise<{ applications: CareerApplicationItem[]; total: number; totalPages: number }> {
+    const query = new URLSearchParams();
+    if (params?.page) query.append("page", params.page.toString());
+    if (params?.limit) query.append("limit", params.limit.toString());
+    if (params?.status && params.status !== "all") query.append("status", params.status);
+    if (params?.search) query.append("search", params.search);
+
+    const res = await fetch(`${API_BASE_URL}/api/admin/career-applications?${query.toString()}`, {
+      headers: getAuthHeaders(),
+      credentials: "include",
+    });
+    if (!res.ok) return { applications: [], total: 0, totalPages: 1 };
+    const json = await res.json();
+    return json.data || { applications: [], total: 0, totalPages: 1 };
+  },
+
+  async updateCareerApplicationStatus(id: string, payload: { status?: string; notes?: string }) {
+    const res = await fetch(`${API_BASE_URL}/api/admin/career-applications/${id}/status`, {
+      method: "PUT",
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || "Failed to update career application status");
+    return json.data;
+  },
+
+  async deleteCareerApplication(id: string) {
+    const res = await fetch(`${API_BASE_URL}/api/admin/career-applications/${id}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+      credentials: "include",
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || "Failed to delete career application");
+    return json;
   },
 
   // Case Studies

@@ -1,241 +1,214 @@
-import React from "react";
-import { Metadata } from "next";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { BackgroundGrid } from "@/components/ui/BackgroundGrid";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 import { FloatingCTA } from "@/components/ui/FloatingCTA";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { SectionWrapper, GridStaggerItem } from "@/components/ui/SectionWrapper";
+import { SectionWrapper } from "@/components/ui/SectionWrapper";
+import { CandidateApplicationModal } from "@/components/careers/CandidateApplicationModal";
 import { publicApi, CareerItem } from "@/lib/api";
-import { 
-  Briefcase, 
-  MapPin, 
-  Clock, 
-  ArrowRight, 
-  Sparkles, 
-  CheckCircle2, 
-  Award, 
-  Zap, 
-  Users, 
-  Building,
+import {
+  Briefcase,
+  MapPin,
+  ArrowRight,
+  Clock,
+  Sparkles,
   AlertTriangle,
   RefreshCw,
-  Mail
+  Send,
+  FileCheck
 } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Careers & Engineering Roles | SparkIntellect",
-  description:
-    "Build the future of AI & Enterprise Software with SparkIntellect. Explore full-time engineering and product design openings in Guindy, Chennai.",
-};
+export default function CareersPage() {
+  const [careers, setCareers] = useState<CareerItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [selectedCareer, setSelectedCareer] = useState<CareerItem | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
-const CULTURE_BENEFITS = [
-  {
-    title: "AI-First Engineering",
-    desc: "Work on cutting-edge generative AI models, enterprise RAG, and high-speed web apps.",
-    icon: Sparkles,
-  },
-  {
-    title: "Direct Founder Mentorship",
-    desc: "Collaborate closely with technical leadership and senior enterprise architects.",
-    icon: Users,
-  },
-  {
-    title: "High Ownership & Impact",
-    desc: "No layers of bureaucracy. Ship code to live production in your first sprint.",
-    icon: Zap,
-  },
-  {
-    title: "Competitive Compensation",
-    desc: "Market-leading salary benchmarks, performance incentives, and career growth.",
-    icon: Award,
-  },
-];
+  const loadCareers = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const data = await publicApi.getCareers();
+      const active = (data || []).filter((c) => c.status === "active");
+      setCareers(active);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-export default async function CareersPage() {
-  let careers: CareerItem[] = [];
-  let fetchError = false;
+  useEffect(() => {
+    loadCareers();
+  }, []);
 
-  try {
-    careers = await publicApi.getCareers();
-  } catch (err) {
-    fetchError = true;
-    careers = [];
-  }
+  const handleApplyClick = (career: CareerItem) => {
+    setSelectedCareer(career);
+    setModalOpen(true);
+  };
 
-  const activeRoles = careers.filter((c) => c.status === "active");
+  const handleGeneralApply = () => {
+    setSelectedCareer(null);
+    setModalOpen(true);
+  };
 
   return (
-    <div className="relative min-h-screen bg-white text-[#0B1220] selection:bg-[#9FCFFB] selection:text-[#0B1220]">
+    <div className="relative min-h-screen w-full max-w-full overflow-x-hidden bg-[#EEEAF8] text-[#2B2A6B] selection:bg-[#2B2A6B] selection:text-[#EEEAF8]">
       <BackgroundGrid />
       <Navbar />
 
-      <main className="relative z-10 pt-32 pb-24">
-        {/* Hero */}
-        <SectionWrapper className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest bg-[#D6EBFF] border border-[#BEE0FF] text-[#0B1220] mb-6">
-            <Briefcase className="w-4 h-4 text-[#0284c7]" />
-            <span>Join Our Engineering Team</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-6xl font-serif text-[#0B1220] max-w-4xl mx-auto leading-tight mb-6">
-            Build the Future of{" "}
-            <span className="text-gradient-navy italic font-serif">Intelligent Software</span>
-          </h1>
-
-          <p className="text-lg sm:text-xl text-[#334155] max-w-3xl mx-auto leading-relaxed mb-8">
-            SparkIntellect is expanding our core engineering team in Guindy, Chennai. We are looking for talented full-stack engineers and AI specialists who value clean code, high speed, and architectural integrity.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="#open-roles"
-              className="px-8 py-4 rounded-full font-bold text-sm bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-lg shadow-[#9FCFFB]/30 hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
-            >
-              <span>View Open Positions ({activeRoles.length})</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
-            <Link
-              href="/internships"
-              className="px-8 py-4 rounded-full font-semibold text-sm bg-[#F2F9FF] text-[#0B1220] border border-[#BEE0FF] hover:bg-[#D6EBFF] transition-all"
-            >
-              Looking for Internships?
-            </Link>
-          </div>
-        </SectionWrapper>
-
-        {/* Culture & Benefits */}
-        <SectionWrapper className="bg-[#F2F9FF] py-20 border-y border-[#BEE0FF] mb-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionHeading
-              badge="Engineering Culture"
-              title="Why Build Your Career at"
-              highlightTitle="SparkIntellect?"
-              subtitle="We cultivate an environment focused on senior craftsmanship, rapid experimentation, and clear ownership."
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {CULTURE_BENEFITS.map((b, idx) => {
-                const Icon = b.icon;
-                return (
-                  <GridStaggerItem key={b.title} index={idx}>
-                    <div className="luxury-card p-6 rounded-3xl border border-[#BEE0FF] h-full flex flex-col justify-between bg-white shadow-sm">
-                      <div>
-                        <div className="w-12 h-12 rounded-2xl bg-[#D6EBFF] border border-[#BEE0FF] flex items-center justify-center mb-5 text-[#0284c7]">
-                          <Icon className="w-6 h-6" />
-                        </div>
-                        <h3 className="text-base font-serif font-bold text-[#0B1220] mb-2">{b.title}</h3>
-                        <p className="text-xs text-[#334155] leading-relaxed">{b.desc}</p>
-                      </div>
-                    </div>
-                  </GridStaggerItem>
-                );
-              })}
-            </div>
-          </div>
-        </SectionWrapper>
-
-        {/* Open Positions */}
-        <SectionWrapper id="open-roles" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24 scroll-mt-28">
+      <main className="relative z-10 pt-28 sm:pt-36 pb-20 sm:pb-24 w-full max-w-full overflow-x-hidden">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          
           <SectionHeading
-            badge="Current Openings"
-            title="Open Engineering &"
-            highlightTitle="Product Roles"
-            subtitle="Explore available full-time positions across our AI and software engineering departments."
+            badge="Engineering Careers"
+            title="Current Openings at"
+            highlightTitle="SparkIntellect"
+            subtitle="Explore active full-time engineering and architecture vacancies. Direct production ownership and competitive compensation."
           />
 
-          {fetchError ? (
-            <div className="luxury-card p-10 rounded-3xl border border-rose-200 bg-rose-50/50 text-center max-w-lg mx-auto space-y-4 shadow-sm">
-              <AlertTriangle className="w-10 h-10 text-rose-600 mx-auto" />
-              <h3 className="text-lg font-serif font-bold text-[#0B1220]">
-                Unable to load current career opportunities
+          {loading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="glass-card rounded-3xl h-36 animate-pulse bg-white/[0.03]" />
+              ))}
+            </div>
+          ) : error ? (
+            <div className="glass-panel p-10 rounded-3xl border border-rose-500/30 bg-[#2B2A6B]/95 text-[#EEEAF8] text-center max-w-lg mx-auto space-y-4 shadow-xl">
+              <AlertTriangle className="w-10 h-10 text-[#d4a373] mx-auto" />
+              <h3 className="text-lg font-display font-bold text-[#EEEAF8]">
+                Unable to load career openings
               </h3>
-              <p className="text-xs text-[#334155] leading-relaxed">
-                We are experiencing a temporary connection issue. Please refresh or try again in a few moments.
+              <p className="text-xs text-[#EEEAF8]/80">
+                We encountered a temporary connection issue. Please retry.
               </p>
-              <Link
-                href="/careers"
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-xs bg-[#0B1220] text-white hover:bg-slate-800 transition-colors shadow-md"
+              <button
+                onClick={loadCareers}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-xs glass-btn-primary shadow-md"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
-                <span>Try Again</span>
-              </Link>
+                <span>Retry</span>
+              </button>
             </div>
-          ) : activeRoles.length === 0 ? (
-            <div className="luxury-card p-10 sm:p-14 rounded-3xl border border-[#BEE0FF] bg-gradient-to-br from-white via-[#F2F9FF] to-white text-center max-w-2xl mx-auto space-y-4 shadow-sm">
-              <div className="w-14 h-14 rounded-2xl bg-[#D6EBFF] text-[#0284c7] flex items-center justify-center mx-auto shadow-inner">
+          ) : careers.length === 0 ? (
+            <div className="glass-panel p-12 rounded-3xl border border-[#EEEAF8]/25 bg-[#2B2A6B]/95 text-[#EEEAF8] text-center max-w-xl mx-auto space-y-5 shadow-2xl">
+              <div className="w-14 h-14 rounded-2xl bg-[#EEEAF8]/10 text-[#d4a373] border border-[#EEEAF8]/20 flex items-center justify-center mx-auto">
                 <Briefcase className="w-7 h-7" />
               </div>
               
-              <h3 className="text-2xl font-serif font-bold text-[#0B1220]">
-                No Current Career Openings
+              <h3 className="text-2xl font-display font-bold text-[#EEEAF8]">
+                No Active Openings Currently
               </h3>
               
-              <p className="text-xs sm:text-sm text-[#334155] max-w-md mx-auto leading-relaxed">
-                We don&apos;t have any active job openings right now. We are always interested in connecting with outstanding engineers and AI practitioners for future opportunities.
+              <p className="text-xs sm:text-sm text-[#EEEAF8]/80 leading-relaxed">
+                All scheduled vacancies are currently filled. Outstanding engineers and AI architects are always encouraged to submit a general candidate profile.
               </p>
               
               <div className="pt-2">
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-xs bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-md transition-all"
+                <button
+                  onClick={handleGeneralApply}
+                  className="glass-btn-primary inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-display font-bold text-xs uppercase tracking-wider shadow-lg"
                 >
-                  <Mail className="w-3.5 h-3.5" />
-                  <span>Submit General Application</span>
-                </Link>
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Submit Candidate Profile</span>
+                </button>
               </div>
             </div>
           ) : (
             <div className="space-y-6">
-              {activeRoles.map((role) => (
-                <div
-                  key={role._id || role.id || role.slug}
-                  className="luxury-card luxury-card-hover p-8 rounded-3xl border border-[#BEE0FF] bg-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-sm"
-                >
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="px-3 py-1 rounded-full bg-[#D6EBFF] text-[#0284c7] font-mono font-bold text-xs">
-                        {role.department}
-                      </span>
-                      <span className="text-xs font-mono text-[#334155]">
-                        {role.type} • {role.experience}
-                      </span>
+              {careers.map((role) => {
+                const cleanLocation = (role.location || "Chennai (Hybrid)").replace(/Guindy,?\s*/i, "");
+
+                return (
+                  <div
+                    key={role._id || role.id || role.slug}
+                    className="glass-card p-7 sm:p-8 rounded-3xl border border-[#EEEAF8]/20 bg-[#2B2A6B]/95 text-[#EEEAF8] hover:border-[#d4a373]/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl transition-all group"
+                  >
+                    <div className="space-y-3 flex-1">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <span className="px-3 py-1 rounded-full bg-[#EEEAF8]/10 border border-[#EEEAF8]/20 text-[#d4a373] font-mono font-bold text-xs">
+                          {role.department}
+                        </span>
+                        <span className="text-xs font-mono text-[#EEEAF8]/70">
+                          {role.type} • {role.experience}
+                        </span>
+                      </div>
+
+                      <h3 className="text-2xl font-display font-bold text-[#EEEAF8] group-hover:text-white transition-colors">
+                        {role.title}
+                      </h3>
+
+                      <p className="text-xs text-[#EEEAF8]/80 max-w-2xl leading-relaxed">
+                        {role.shortDesc}
+                      </p>
+
+                      <div className="flex items-center gap-4 text-xs text-[#EEEAF8]/70 pt-1">
+                        <span className="flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-[#d4a373]" />
+                          <span>{cleanLocation}</span>
+                        </span>
+                      </div>
                     </div>
 
-                    <h3 className="text-2xl font-serif font-bold text-[#0B1220]">
-                      {role.title}
-                    </h3>
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full md:w-auto">
+                      <Link
+                        href={`/careers/${role.slug}`}
+                        className="px-5 py-3 rounded-xl text-xs font-semibold glass-btn-secondary text-center"
+                      >
+                        Role Details
+                      </Link>
 
-                    <p className="text-xs text-[#334155] max-w-2xl leading-relaxed">
-                      {role.shortDesc}
-                    </p>
-
-                    <div className="flex items-center gap-4 text-xs text-[#334155] pt-1">
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-[#0284c7]" />
-                        {role.location}
-                      </span>
+                      <button
+                        onClick={() => handleApplyClick(role)}
+                        className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider glass-btn-primary flex items-center justify-center gap-2 shadow-lg"
+                      >
+                        <span>Apply Now</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
+                );
+              })}
 
-                  <Link
-                    href={`/careers/${role.slug}`}
-                    className="px-6 py-3 rounded-full font-bold text-xs bg-[#9FCFFB] text-[#0B1220] hover:bg-[#8ec2f3] shadow-md flex items-center gap-2 shrink-0 transition-all"
-                  >
-                    <span>View Role & Apply</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
+              {/* General Application Banner */}
+              <div className="glass-panel p-8 rounded-3xl border border-[#EEEAF8]/25 bg-[#2B2A6B]/90 text-[#EEEAF8] flex flex-col sm:flex-row items-center justify-between gap-4 mt-8">
+                <div>
+                  <h4 className="text-base font-display font-bold text-[#EEEAF8]">
+                    Don&apos;t see your specific specialization?
+                  </h4>
+                  <p className="text-xs text-[#EEEAF8]/80 mt-0.5">
+                    Submit your details and resume directly to our talent pipeline for upcoming pods.
+                  </p>
                 </div>
-              ))}
+                <button
+                  onClick={handleGeneralApply}
+                  className="px-6 py-3 rounded-xl text-xs font-bold glass-btn-secondary shrink-0 flex items-center gap-2"
+                >
+                  <FileCheck className="w-4 h-4 text-[#d4a373]" />
+                  <span>General Application</span>
+                </button>
+              </div>
             </div>
           )}
-        </SectionWrapper>
 
+        </div>
       </main>
 
       <Footer />
       <FloatingCTA />
+
+      {/* Candidate Multi-Step Application Modal */}
+      <CandidateApplicationModal
+        career={selectedCareer}
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        availableCareers={careers}
+      />
     </div>
   );
 }
